@@ -10,17 +10,19 @@ export class MagnetCustomerOAuth2Api implements ICredentialType {
 	documentationUrl = 'https://developers.magnetcustomer.com';
 
 	properties: INodeProperties[] = [
-		// {
-		// 	displayName: 'Sub Domain',
-		// 	name: 'subDomain',
-		// 	type: 'string',
-		// 	default: '',
-		// },
 		{
 			displayName: 'Grant Type',
 			name: 'grantType',
 			type: 'hidden',
-			default: 'authorization_code',
+			default: 'authorizationCode',
+		},
+		{
+			displayName: 'Magnet Customer Platform URL',
+			name: 'domain',
+			type: 'string',
+			default: '',
+			placeholder: 'https://yourplatform.magnetcustomer.com',
+			description: 'The url platform to connect to. Change "yourplatform" to your subdomain.',
 		},
 		{
 			displayName: 'Authorization URL',
