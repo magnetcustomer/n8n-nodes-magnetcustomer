@@ -11,23 +11,29 @@ export class MagnetCustomerOAuth2Api implements ICredentialType {
 
 	properties: INodeProperties[] = [
 		{
+			displayName: 'Sub Domain',
+			name: 'subDomain',
+			type: 'string',
+			default: '',
+		},
+		{
 			displayName: 'Grant Type',
 			name: 'grantType',
 			type: 'hidden',
-			default: 'authorizationCode',
+			default: 'authorization_code',
 		},
 		{
 			displayName: 'Authorization URL',
 			name: 'authUrl',
 			type: 'hidden',
-			default: 'https://oauth.magnetcustomer.com/oauth/authorize',
+			default: 'https://magnetcustomer.net/realms/platform/protocol/openid-connect/auth',
 			required: true,
 		},
 		{
 			displayName: 'Access Token URL',
 			name: 'accessTokenUrl',
 			type: 'hidden',
-			default: 'https://oauth.magnetCustomer.com/oauth/token',
+			default: 'https://magnetcustomer.net/realms/platform/protocol/openid-connect/token',
 			required: true,
 		},
 		{
