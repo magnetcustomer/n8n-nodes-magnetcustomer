@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-base.magnetcustomer",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Communication", "Sales", "Marketing"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://developers.magnetcustomer.com"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://developers.magnetcustomer.com"
+			}
+		]
+	}
+}
