@@ -42,13 +42,13 @@ export class MagnetCustomerOAuth2Api implements ICredentialType {
 			displayName: 'Scope',
 			name: 'scope',
 			type: 'hidden',
-			default: '',
+			default: 'email offline_access',
 		},
 		{
 			displayName: 'Auth URI Query Parameters',
 			name: 'authQueryParameters',
 			type: 'hidden',
-			default: 'grant_type=authorization_code&state=&iss=',
+			default: '',
 		},
 		{
 			displayName: 'Authentication',
