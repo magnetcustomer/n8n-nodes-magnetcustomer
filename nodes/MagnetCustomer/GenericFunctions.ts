@@ -8,21 +8,28 @@ import type {
 	IRequestOptions,
 	JsonObject,
 } from 'n8n-workflow';
-import { NodeApiError, NodeOperationError } from 'n8n-workflow';
+import {NodeApiError} from 'n8n-workflow';
 
-export interface ICustomInterface {
+export interface ICustomFieldInterface {
+	_id: string;
+	system: boolean;
+	feature: string;
 	name: string;
-	key: string;
-	field_type: string;
-	options?: Array<{
-		id: number;
-		label: string;
+	slug: string;
+	fieldType: { fieldType: string };
+	fieldRef?: string;
+	values?: Array<{
+		_id: string;
+		value: string;
 	}>;
+	position?: number;
+	active: boolean;
 }
 
-export interface ICustomProperties {
-	[key: string]: ICustomInterface;
+export interface ICustomField {
+	[key: string]: ICustomFieldInterface;
 }
+
 
 /**
  * Make an API request to MagnetCustomer
@@ -31,64 +38,46 @@ export interface ICustomProperties {
 export async function magnetCustomerApiRequest(
 	this: IHookFunctions | IExecuteFunctions | ILoadOptionsFunctions,
 	method: IHttpRequestMethods,
-	endpoint: string,
+	resource: string,
 	body: IDataObject,
-	query: IDataObject = {},
-	formData?: IDataObject,
-	downloadFile?: boolean,
+	qs: IDataObject = {},
+	uri?: string,
+	option: IDataObject = {},
 ): Promise<any> {
 	const authenticationMethod = this.getNodeParameter('authentication', 0);
+	let credentials;
 
-	const options: IRequestOptions = {
-		headers: {
-			Accept: 'application/json',
-		},
-		method,
-		qs: query,
-		uri: `https://api.magnetCustomer.com/v1${endpoint}`,
-	};
-
-	if (downloadFile === true) {
-		options.encoding = null;
+	if (authenticationMethod === 'apiToken') {
+		credentials = await this.getCredentials<{ subDomainAccount: string }>('magnetCustomerApi');
 	} else {
-		options.json = true;
+		credentials = await this.getCredentials<{ subDomainAccount: string }>('magnetCustomerOAuth2Api');
 	}
 
+	let options: IRequestOptions = {
+		method,
+		qs,
+		body,
+		uri: uri ?? `https://platform-api.${credentials.subDomainAccount}.magnetcustomer.com${resource}`,
+		json: true,
+		headers: {
+			api: 'n8n',
+		},
+		qsStringifyOptions: {
+			arrayFormat: 'brackets',
+		},
+	};
+
+	options = Object.assign({}, options, option);
+	if (Object.keys(options.body as IDataObject).length === 0) {
+		delete options.body;
+	}
 	if (Object.keys(body).length !== 0) {
 		options.body = body;
 	}
 
-	if (formData !== undefined && Object.keys(formData).length !== 0) {
-		options.formData = formData;
-	}
-
-	if (query === undefined) {
-		query = {};
-	}
-
 	try {
-		const credentialType =
-			authenticationMethod === 'apiToken' ? 'magnetCustomerApi' : 'magnetCustomerOAuth2Api';
-		const responseData = await this.helpers.requestWithAuthentication.call(
-			this,
-			credentialType,
-			options,
-		);
-
-		if (downloadFile === true) {
-			return {
-				data: responseData,
-			};
-		}
-
-		if (responseData.success === false) {
-			throw new NodeApiError(this.getNode(), responseData as JsonObject);
-		}
-
-		return {
-			additionalData: responseData.additional_data,
-			data: responseData.data === null ? [] : responseData.data,
-		};
+		const credentialType = authenticationMethod === 'apiToken' ? 'magnetCustomerApi' : 'magnetCustomerOAuth2Api';
+		return this.helpers.requestWithAuthentication.call(this, credentialType, options,);
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
@@ -99,38 +88,31 @@ export async function magnetCustomerApiRequest(
  * and return all results
  *
  * @param method
- * @param endpoint
+ * @param resource
  * @param body
  * @param query
  */
 export async function magnetCustomerApiRequestAllItems(
-	this: IHookFunctions | IExecuteFunctions,
+	this: IHookFunctions | IExecuteFunctions | ILoadOptionsFunctions,
 	method: IHttpRequestMethods,
-	endpoint: string,
+	resource: string,
 	body: IDataObject,
 	query?: IDataObject,
 ): Promise<any> {
 	if (query === undefined) {
 		query = {};
 	}
-	query.limit = 100;
-	query.start = 0;
+	query.page = 1;
 
 	const returnData: IDataObject[] = [];
-
 	let responseData;
 
 	do {
-		responseData = await magnetCustomerApiRequest.call(this, method, endpoint, body, query);
-		// the search path returns data diferently
-		if (responseData.data.items) {
-			returnData.push.apply(returnData, responseData.data.items as IDataObject[]);
-		} else {
-			returnData.push.apply(returnData, responseData.data as IDataObject[]);
-		}
+		responseData = await magnetCustomerApiRequest.call(this, method, resource, body, query);
+		returnData.push.apply(returnData, responseData.docs as IDataObject[]);
 
-		query.start = responseData.additionalData.pagination.next_start;
-	} while (responseData.additionalData?.pagination?.more_items_in_collection === true);
+		query.page = responseData.nextPage;
+	} while (responseData.hasNextPage === true);
 
 	return {
 		data: returnData,
@@ -140,46 +122,33 @@ export async function magnetCustomerApiRequestAllItems(
 /**
  * Gets the custom properties from MagnetCustomer
  *
- * @param {(IHookFunctions | IExecuteFunctions)} this
+ * @param resource
+ * @param creatableWhen
  */
-export async function magnetCustomerGetCustomProperties(
+export async function magnetCustomerGetCustomFields(
 	this: IHookFunctions | IExecuteFunctions,
 	resource: string,
-): Promise<ICustomProperties> {
-	const endpoints: { [key: string]: string } = {
-		activity: '/activityFields',
-		deal: '/dealFields',
-		organization: '/organizationFields',
-		person: '/personFields',
-		product: '/productFields',
-	};
-
-	if (endpoints[resource] === undefined) {
-		throw new NodeOperationError(
-			this.getNode(),
-			`The resource "${resource}" is not supported for resolving custom values!`,
-		);
-	}
+): Promise<ICustomField[]> {
 
 	const requestMethod = 'GET';
-
 	const body = {};
-	const qs = {};
+	const qs = {
+		"creatable": true,
+		"feature": resource,
+		"subFieldSettings.active": false,
+	};
+	const endpoint = '/customfields';
+
 	// Get the custom properties and their values
 	const responseData = await magnetCustomerApiRequest.call(
 		this,
 		requestMethod,
-		endpoints[resource],
+		endpoint,
 		body,
 		qs,
 	);
 
-	const customProperties: ICustomProperties = {};
-
-	for (const customPropertyData of responseData.data) {
-		customProperties[customPropertyData.key] = customPropertyData;
-	}
-	return customProperties;
+	return responseData;
 }
 
 /**
@@ -188,38 +157,24 @@ export async function magnetCustomerGetCustomProperties(
  *
  */
 export function magnetCustomerEncodeCustomProperties(
-	customProperties: ICustomProperties,
+	customFieldList: ICustomField,
 	item: IDataObject,
 ): void {
-	let customPropertyData;
+	let customFieldData;
 
 	for (const key of Object.keys(item)) {
-		customPropertyData = Object.values(customProperties).find(
-			(propertyData) => propertyData.name === key,
-		);
+		customFieldData = Object.values(customFieldList).find((propertyData) => propertyData.name === key);
 
-		if (customPropertyData !== undefined) {
-			// Is a custom property
-
-			// Check if also the value has to be resolved or just the key
-			if (
-				item[key] !== null &&
-				item[key] !== undefined &&
-				customPropertyData.options !== undefined &&
-				Array.isArray(customPropertyData.options)
-			) {
-				// Has an option key so get the actual option-value
-				const propertyOption = customPropertyData.options.find(
-					(option) => option.label.toString() === item[key]!.toString(),
-				);
-
+		if (customFieldData !== undefined) {
+			if (item[key] !== null && item[key] !== undefined && customFieldData.values !== undefined && Array.isArray(customFieldData.values)) {
+				const propertyOption = customFieldData.values.find((option) => option.value.toString() === item[key]?.toString());
 				if (propertyOption !== undefined) {
-					item[customPropertyData.key] = propertyOption.id;
+					item[`customField_${customFieldData._id}`] = propertyOption._id;
 					delete item[key];
 				}
-			} else {
-				// Does already represent the actual value or is null
-				item[customPropertyData.key] = item[key];
+			}
+			else {
+				item[`customField_${customFieldData._id}`] = item[key];
 				delete item[key];
 			}
 		}
@@ -230,71 +185,41 @@ export function magnetCustomerEncodeCustomProperties(
  * Converts names and values of custom properties to their actual values
  *
  */
-export function magnetCustomerResolveCustomProperties(
-	customProperties: ICustomProperties,
+export function magnetCustomerResolveCustomFields(
+	customFieldList: ICustomField,
 	item: IDataObject,
 ): void {
-	let customPropertyData;
+	let customFieldData;
 
 	const json = item.json as IDataObject;
-
-	// Iterate over all keys and replace the custom ones
 	for (const [key, value] of Object.entries(json)) {
-		if (customProperties[key] !== undefined) {
-			// Is a custom property
-			customPropertyData = customProperties[key];
+		if (customFieldList[key] !== undefined) {
+			customFieldData = customFieldList[key];
 
-			// value is not set, so nothing to resolve
 			if (value === null) {
-				json[customPropertyData.name] = value;
+				json[customFieldData.name] = value;
 				delete json[key];
 				continue;
 			}
 
-			if (
-				[
-					'date',
-					'address',
-					'double',
-					'monetary',
-					'org',
-					'people',
-					'phone',
-					'text',
-					'time',
-					'user',
-					'varchar',
-					'varchar_auto',
-					'int',
-					'time',
-					'timerange',
-				].includes(customPropertyData.field_type)
-			) {
-				json[customPropertyData.name] = value;
+			if (['varchar', 'text', 'phone', 'link', 'date', 'time', 'enum', 'monetary', 'double',].includes(customFieldData.fieldType.fieldType)) {
+				json[customFieldData.name] = value;
 				delete json[key];
-				// type options
-			} else if (
-				['enum', 'visible_to'].includes(customPropertyData.field_type) &&
-				customPropertyData.options
-			) {
-				const propertyOption = customPropertyData.options.find(
-					(option) => option.id.toString() === value?.toString(),
-				);
+			}
+			else if (['enum'].includes(customFieldData.fieldType.fieldType) && customFieldData.values) {
+				const propertyOption = customFieldData.values.find((option) => option._id.toString() === value?.toString());
 				if (propertyOption !== undefined) {
-					json[customPropertyData.name] = propertyOption.label;
+					json[customFieldData.name] = propertyOption.value;
 					delete json[key];
 				}
-				// type multioptions
-			} else if (
-				['set'].includes(customPropertyData.field_type) &&
-				customPropertyData.options &&
-				typeof value === 'string'
-			) {
+			}
+			else if (['set'].includes(customFieldData.fieldType.fieldType) && customFieldData.values && typeof value === 'string') {
 				const selectedIds = value.split(',');
-				const selectedLabels = customPropertyData.options
-					.filter((option) => selectedIds.includes(option.id.toString()))
-					.map((option) => option.label);
-				json[customPropertyData.name] = selectedLabels;
+				const selectedLabels = customFieldData.values
+					.filter((option) => selectedIds.includes(option._id.toString()))
+					.map((option) => option.value);
+
+				json[customFieldData.name] = selectedLabels;
 				delete json[key];
 			}
 		}

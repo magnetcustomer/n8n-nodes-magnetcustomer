@@ -17,12 +17,13 @@ export class MagnetCustomerOAuth2Api implements ICredentialType {
 			default: 'authorizationCode',
 		},
 		{
-			displayName: 'Magnet Customer Platform URL',
-			name: 'domain',
+			displayName: 'Subdomain Platform URL',
+			name: 'subDomainAccount',
 			type: 'string',
+			description: 'The subdomain of your Magnet Customer Platform.',
+			placeholder: 'company',
 			default: '',
-			placeholder: 'https://yourplatform.magnetcustomer.com',
-			description: 'The url platform to connect to. Change "yourplatform" to your subdomain.',
+			required: true,
 		},
 		{
 			displayName: 'Authorization URL',

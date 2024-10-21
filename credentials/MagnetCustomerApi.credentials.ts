@@ -9,6 +9,22 @@ export class MagnetCustomerApi implements ICredentialType {
 
 	properties: INodeProperties[] = [
 		{
+			displayName: 'Subdomain Platform URL',
+			name: 'subDomainAccount',
+			type: 'string',
+			description: 'The subdomain of your Magnet Customer Platform.',
+			placeholder: 'company',
+			default: '',
+			required: true,
+		},
+		{
+			displayName: 'E-mail',
+			name: 'email',
+			type: 'string',
+			description: 'name@email.com',
+			default: '',
+		},
+		{
 			displayName: 'API Token',
 			name: 'apiToken',
 			type: 'string',
@@ -21,7 +37,7 @@ export class MagnetCustomerApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				Authorization: 'Bearer ={{$credentials.apiToken}}',
+				Authorization: '=Bearer {{$credentials.apiToken}}',
 			},
 		},
 	};
