@@ -21,8 +21,8 @@ import {
 } from './GenericFunctions';
 
 import {customerFields, customerOperations} from './CustomerDescription';
-import {leadFields, leadOperations} from './LeadDescription';
-import {prospectFields, prospectOperations} from './ProspectDescription';
+// import {leadFields, leadOperations} from './LeadDescription';
+// import {prospectFields, prospectOperations} from './ProspectDescription';
 import {dealFields, dealOperations} from './DealDescription';
 import {organizationFields, organizationOperations} from './OrganizationDescription';
 
@@ -137,11 +137,11 @@ export class MagnetCustomer implements INodeType {
 			...customerOperations,
 			...customerFields,
 
-			...leadOperations,
-			...leadFields,
-
-			...prospectOperations,
-			...prospectFields,
+			// ...leadOperations,
+			// ...leadFields,
+			//
+			// ...prospectOperations,
+			// ...prospectFields,
 
 			...dealOperations,
 			...dealFields,
