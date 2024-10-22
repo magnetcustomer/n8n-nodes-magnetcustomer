@@ -244,3 +244,35 @@ export function sortOptionParameters(
 
 	return optionParameters;
 }
+
+
+export function addPhones(collection: { phones?: [{ number: string }] }) {
+	const phones: Array<{ typePhone: string; number: any; }> = [];
+
+	if (!collection?.phones) return phones;
+
+	for (const phone of collection.phones) {
+		phones.push({typePhone: 'business', number: phone.number});
+	}
+
+	return phones;
+}
+
+export function addCustomFields(collection: { customFields?: [{ name: string, v: string }] }) {
+	const customFields: Array<{ customField: any; k: any; v: any; }> = [];
+
+	if (!collection?.customFields) return customFields;
+
+	for (const customField of collection.customFields) {
+
+		const id = (customField.name.split("customField_"))[1];
+		customFields.push({
+			"customField": id,
+			"k": id,
+			"v": customField.v,
+		});
+
+	}
+
+	return customFields;
+}

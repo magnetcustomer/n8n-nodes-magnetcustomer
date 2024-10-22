@@ -3,23 +3,13 @@ import {
 	IExecuteFunctions,
 	IHookFunctions,
 	ILoadOptionsFunctions,
-	LoggerProxy as Logger
 } from "n8n-workflow";
-import {magnetCustomerApiRequest, magnetCustomerApiRequestAllItems} from "./GenericFunctions";
-
-function addAdditionalFields(customFieldCollection: any) {
-	const customFields = [];
-
-	for (const customField of customFieldCollection.customFields) {
-		customFields.push({
-			customField: customField.name,
-			k: customField.name,
-			v: customField.v,
-		});
-	}
-
-	return customFields;
-}
+import {
+	addCustomFields,
+	addPhones,
+	magnetCustomerApiRequest,
+	magnetCustomerApiRequestAllItems
+} from "./GenericFunctions";
 
 
 export async function organizationRequest(
@@ -29,7 +19,7 @@ export async function organizationRequest(
 
 	let requestMethod;
 	let endpoint;
-	const body: IDataObject = {};
+	let body: IDataObject = {};
 	const qs: IDataObject = {};
 
 
@@ -37,7 +27,23 @@ export async function organizationRequest(
 		case 'create':
 			requestMethod = 'POST';
 			endpoint = '/import/organizations';
-			body.customFields = addAdditionalFields(this.getNodeParameter('customFieldCollection', index));
+			body = {
+				fullname: this.getNodeParameter('fullname', index),
+				email: this.getNodeParameter('email', index),
+				phones: addPhones(this.getNodeParameter('phoneCollection', index) as object),
+				birthDate: this.getNodeParameter('birthDate', index),
+				doc: this.getNodeParameter('doc', index),
+				state: this.getNodeParameter('state', index),
+				city: this.getNodeParameter('city', index),
+				address: this.getNodeParameter('address', index),
+				addressNumber: this.getNodeParameter('addressNumber', index),
+				complement: this.getNodeParameter('complement', index),
+				neighborhood: this.getNodeParameter('neighborhood', index),
+				cep: this.getNodeParameter('cep', index),
+				owners: [this.getNodeParameter('owners', index)],
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
+				source: this.getNodeParameter('source', index),
+			};
 			break;
 		case 'delete':
 			requestMethod = 'DELETE';
@@ -54,7 +60,23 @@ export async function organizationRequest(
 		case 'update':
 			requestMethod = 'PUT';
 			endpoint = `/organizations/${this.getNodeParameter('organizationId', index)}`;
-			body.customFields = addAdditionalFields(this.getNodeParameter('customFieldCollection', index));
+			body = {
+				fullname: this.getNodeParameter('fullname', index),
+				email: this.getNodeParameter('email', index),
+				phones: addPhones(this.getNodeParameter('phoneCollection', index) as object),
+				birthDate: this.getNodeParameter('birthDate', index),
+				doc: this.getNodeParameter('doc', index),
+				state: this.getNodeParameter('state', index),
+				city: this.getNodeParameter('city', index),
+				address: this.getNodeParameter('address', index),
+				addressNumber: this.getNodeParameter('addressNumber', index),
+				complement: this.getNodeParameter('complement', index),
+				neighborhood: this.getNodeParameter('neighborhood', index),
+				cep: this.getNodeParameter('cep', index),
+				owners: [this.getNodeParameter('owners', index)],
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
+				source: this.getNodeParameter('source', index),
+			};
 			break;
 		case 'search':
 			requestMethod = 'GET';
@@ -65,13 +87,9 @@ export async function organizationRequest(
 			break;
 	}
 
-	Logger.debug(`requestMethod:: ${requestMethod}`);
-	Logger.debug(`endpoint:: ${endpoint}`);
-	Logger.debug(`body:: ${JSON.stringify(body)}`);
-	Logger.debug(`qs:: ${JSON.stringify(qs)}`);
 
 	if (operation === 'getAll') return magnetCustomerApiRequestAllItems.call(this, requestMethod, endpoint, body, qs,);
 
-	return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-}
+	const {organization} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+	return organization;}
 

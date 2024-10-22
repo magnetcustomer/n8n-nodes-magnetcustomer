@@ -3,24 +3,12 @@ import {
 	IExecuteFunctions,
 	IHookFunctions,
 	ILoadOptionsFunctions,
-	LoggerProxy as Logger
 } from "n8n-workflow";
-import {magnetCustomerApiRequest, magnetCustomerApiRequestAllItems} from "./GenericFunctions";
-
-function addAdditionalFields(customFieldCollection: any) {
-	const customFields = [];
-
-	for (const customField of customFieldCollection.customFields) {
-		customFields.push({
-			customField: customField.name,
-			k: customField.name,
-			v: customField.v,
-		});
-	}
-
-	return customFields;
-}
-
+import {
+	addCustomFields,
+	magnetCustomerApiRequest,
+	magnetCustomerApiRequestAllItems
+} from "./GenericFunctions";
 
 export async function dealRequest(
 	this: IHookFunctions | IExecuteFunctions | ILoadOptionsFunctions,
@@ -29,7 +17,7 @@ export async function dealRequest(
 
 	let requestMethod;
 	let endpoint;
-	const body: IDataObject = {};
+	let body: IDataObject = {};
 	const qs: IDataObject = {};
 
 
@@ -37,14 +25,28 @@ export async function dealRequest(
 		case 'create':
 			requestMethod = 'POST';
 			endpoint = '/import/deals';
+			body = {
+				title: this.getNodeParameter('title', index),
+				description: this.getNodeParameter('description', index),
+				amount: this.getNodeParameter('amount', index),
+				expectedCloseDate: this.getNodeParameter('expectedCloseDate', index),
+				pipeline: this.getNodeParameter('pipeline', index),
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
+				source: this.getNodeParameter('source', index),
+			};
 
-			const associateWith = this.getNodeParameter('associateWith', index) as | 'organization' | 'contact';
-			if (associateWith === 'organization') {
-				body.organization = this.getNodeParameter('organization', index) as string;
-			} else {
+			if (this.getNodeParameter('associateWith', index) === 'contact') {
 				body.contact = this.getNodeParameter('contact', index) as string;
 			}
-			body.customFields = addAdditionalFields(this.getNodeParameter('customFieldCollection', index));
+			if (this.getNodeParameter('associateWith', index) === 'organization') {
+				body.organization = this.getNodeParameter('organization', index) as string;
+			}
+			if (this.getNodeParameter('staff', index)) {
+				body.staff = this.getNodeParameter('staff', index);
+			}
+			if (this.getNodeParameter('stage', index)) {
+				body.stage = this.getNodeParameter('stage', index);
+			}
 			break;
 		case 'delete':
 			requestMethod = 'DELETE';
@@ -61,7 +63,28 @@ export async function dealRequest(
 		case 'update':
 			requestMethod = 'PUT';
 			endpoint = `/deals/${this.getNodeParameter('dealId', index)}`;
-			body.customFields = addAdditionalFields(this.getNodeParameter('customFieldCollection', index));
+			body = {
+				title: this.getNodeParameter('title', index),
+				description: this.getNodeParameter('description', index),
+				amount: this.getNodeParameter('amount', index),
+				expectedCloseDate: this.getNodeParameter('expectedCloseDate', index),
+				pipeline: this.getNodeParameter('pipeline', index),
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
+				source: this.getNodeParameter('source', index),
+			};
+
+			if (this.getNodeParameter('associateWith', index) === 'contact') {
+				body.contact = this.getNodeParameter('contact', index) as string;
+			}
+			if (this.getNodeParameter('associateWith', index) === 'organization') {
+				body.organization = this.getNodeParameter('organization', index) as string;
+			}
+			if (this.getNodeParameter('staff', index)) {
+				body.staff = this.getNodeParameter('staff', index);
+			}
+			if (this.getNodeParameter('stage', index)) {
+				body.stage = this.getNodeParameter('stage', index);
+			}
 			break;
 		case 'search':
 			requestMethod = 'GET';
@@ -72,13 +95,8 @@ export async function dealRequest(
 			break;
 	}
 
-	Logger.debug(`requestMethod:: ${requestMethod}`);
-	Logger.debug(`endpoint:: ${endpoint}`);
-	Logger.debug(`body:: ${JSON.stringify(body)}`);
-	Logger.debug(`qs:: ${JSON.stringify(qs)}`);
-
 	if (operation === 'getAll') return magnetCustomerApiRequestAllItems.call(this, requestMethod, endpoint, body, qs,);
 
-	return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-}
+	const {deal} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+	return deal;}
 
