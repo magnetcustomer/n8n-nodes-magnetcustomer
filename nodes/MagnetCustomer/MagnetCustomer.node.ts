@@ -249,7 +249,7 @@ export class MagnetCustomer implements INodeType {
 			// select them easily
 			async getStaffIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/staffs', {});
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/staffs', {});
 				for (const user of data) {
 					if (user.active === true) {
 						returnData.push({
@@ -268,7 +268,7 @@ export class MagnetCustomer implements INodeType {
 			// can select them easily
 			async getPipelineIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/pipelines', {});
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/pipelines', {});
 				for (const pipeline of data) {
 					returnData.push({
 						name: `${pipeline.title}`,
@@ -283,7 +283,7 @@ export class MagnetCustomer implements INodeType {
 			// select them easily
 			async getStageIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/stages', {});
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/stages', {});
 				for (const stage of data) {
 					returnData.push({
 						name: `${(stage.pipeline || {}).title} > ${stage.name}`,
@@ -298,7 +298,7 @@ export class MagnetCustomer implements INodeType {
 			// select them easily
 			async getOrganizationCustomFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
 					"creatable": true,
 					"feature": 'organization',
 					"subFieldSettings.active": false,
@@ -317,7 +317,7 @@ export class MagnetCustomer implements INodeType {
 			// select them easily
 			async getDealCustomFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
 					"creatable": true,
 					"feature": 'deal',
 					"subFieldSettings.active": false,
@@ -336,7 +336,7 @@ export class MagnetCustomer implements INodeType {
 			// select them easily
 			async getCustomerCustomFields(this: ILoadOptionsFunctions,): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
 					"creatable": true,
 					"creatableWhen": 'contact',
 					"feature": 'contact',
@@ -356,7 +356,7 @@ export class MagnetCustomer implements INodeType {
 			// select them easily
 			async getProspectCustomFields(this: ILoadOptionsFunctions,): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
 					"creatable": true,
 					"creatableWhen": 'prospect',
 					"feature": 'contact',
@@ -376,7 +376,7 @@ export class MagnetCustomer implements INodeType {
 			// select them easily
 			async getLeadCustomFields(this: ILoadOptionsFunctions,): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
 					"creatable": true,
 					"creatableWhen": 'lead',
 					"feature": 'contact',
