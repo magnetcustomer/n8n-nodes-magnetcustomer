@@ -8,15 +8,11 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import {NodeConnectionType} from 'n8n-workflow';
+import {LoggerProxy as Logger, NodeConnectionType} from 'n8n-workflow';
 
-import type {ICustomField} from './GenericFunctions';
 import {
 	magnetCustomerApiRequest,
 	magnetCustomerApiRequestAllItems,
-	magnetCustomerEncodeCustomProperties,
-	magnetCustomerGetCustomFields,
-	magnetCustomerResolveCustomFields,
 	sortOptionParameters,
 } from './GenericFunctions';
 
@@ -406,25 +402,12 @@ export class MagnetCustomer implements INodeType {
 		const resource = this.getNodeParameter('resource', 0);
 		const operation = this.getNodeParameter('operation', 0);
 
-		let customFieldList: ICustomField | undefined;
-		if (['get', 'getAll', 'update'].includes(operation) && ['deal', 'organization', 'contact'].includes(resource)) {
-			let getCustomFields = false;
-			if (['update'].includes(operation)) {
-				getCustomFields = this.getNodeParameter('encodeProperties', 0, false) as boolean;
-			} else {
-				getCustomFields = this.getNodeParameter('resolveProperties', 0, false) as boolean;
-			}
-
-			if (getCustomFields) {
-				customFieldList = await magnetCustomerGetCustomFields.call(this, resource);
-			}
-		}
-
 		for (let i = 0; i < items.length; i++) {
 			requestMethod = 'GET';
 			endpoint = '';
 			body = {};
 			qs = {};
+
 			try {
 				if (resource === 'deal') {
 					if (operation === 'create') {
@@ -834,6 +817,11 @@ export class MagnetCustomer implements INodeType {
 					}
 				}
 
+				Logger.debug(`requestMethod:: ${requestMethod}`);
+				Logger.debug(`endpoint:: ${endpoint}`);
+				Logger.debug(`body:: ${body}`);
+				Logger.debug(`qs:: ${qs}`);
+
 				let responseData;
 				if (returnAll) {
 					responseData = await magnetCustomerApiRequestAllItems.call(
@@ -844,7 +832,7 @@ export class MagnetCustomer implements INodeType {
 						qs,
 					);
 				} else {
-					if (customFieldList !== undefined) magnetCustomerEncodeCustomProperties(customFieldList, body);
+					// if (customFieldList !== undefined) magnetCustomerEncodeCustomProperties(customFieldList, body);
 
 					responseData = await magnetCustomerApiRequest.call(
 						this,
@@ -867,11 +855,11 @@ export class MagnetCustomer implements INodeType {
 			}
 		}
 
-		if (customFieldList !== undefined) {
-			for (const item of returnData) {
-				magnetCustomerResolveCustomFields(customFieldList, item);
-			}
-		}
+		// if (customFieldList !== undefined) {
+		// 	for (const item of returnData) {
+		// 		magnetCustomerResolveCustomFields(customFieldList, item);
+		// 	}
+		// }
 
 		return [returnData];
 	}
