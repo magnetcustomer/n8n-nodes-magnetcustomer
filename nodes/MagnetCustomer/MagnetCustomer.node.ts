@@ -593,7 +593,7 @@ export class MagnetCustomer implements INodeType {
 						// ----------------------------------
 
 						requestMethod = 'POST';
-						endpoint = '/contacts';
+						endpoint = '/import/contacts';
 
 						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
 						body.customFields = addAdditionalFields(customFieldCollection);
@@ -670,7 +670,7 @@ export class MagnetCustomer implements INodeType {
 						// ----------------------------------
 
 						requestMethod = 'POST';
-						endpoint = '/prospects';
+						endpoint = 'import/prospects';
 
 						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
 						body.customFields = addAdditionalFields(customFieldCollection);
@@ -747,7 +747,7 @@ export class MagnetCustomer implements INodeType {
 						// ----------------------------------
 
 						requestMethod = 'POST';
-						endpoint = '/leads';
+						endpoint = '/import/leads';
 
 						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
 						body.customFields = addAdditionalFields(customFieldCollection);
