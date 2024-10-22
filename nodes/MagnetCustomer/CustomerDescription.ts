@@ -56,7 +56,7 @@ export const customerOperations: INodeProperties[] = [
 export const customerFields: INodeProperties[] = [
 	{
 		displayName: 'Custom Fields',
-		name: 'customFields',
+		name: 'customFieldCollection',
 		placeholder: 'Add Custom Field',
 		description: 'Adds a custom field to set also values which have not been predefined',
 		type: 'fixedCollection',
@@ -72,26 +72,26 @@ export const customerFields: INodeProperties[] = [
 		default: {},
 		options: [
 			{
-				name: 'customField',
+				name: 'customFields',
 				displayName: 'Custom Field',
 				values: [
 					{
 						displayName: 'Property Name or ID',
-						name: 'name',
+						name: 'customField',
 						type: 'options',
 						typeOptions: {
 							loadOptionsMethod: 'getCustomerCustomFields',
 						},
 						default: '',
 						description:
-							'Name of the property to set. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+							'Name of the field to set. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 					},
 					{
-						displayName: 'Property Value',
-						name: 'value',
+						displayName: 'Field Value',
+						name: 'v',
 						type: 'string',
 						default: '',
-						description: 'Value of the property to set',
+						description: 'Value of the field to set',
 					},
 				],
 			},
@@ -165,20 +165,6 @@ export const customerFields: INodeProperties[] = [
 		default: '',
 		description:
 			'The search term to look for. Minimum 2 characters (or 1 if using exact_match).',
-	},
-	{
-		displayName: 'Exact Match',
-		name: 'exactMatch',
-		type: 'boolean',
-		displayOptions: {
-			show: {
-				operation: ['search'],
-				resource: ['customer'],
-			},
-		},
-		default: false,
-		description:
-			'Whether only full exact matches against the given term are returned. It is not case sensitive.',
 	},
 
 ];
