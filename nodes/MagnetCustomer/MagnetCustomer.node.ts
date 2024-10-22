@@ -26,31 +26,24 @@ import {prospectFields, prospectOperations} from './ProspectDescription';
 import {dealFields, dealOperations} from './DealDescription';
 import {organizationFields, organizationOperations} from './OrganizationDescription';
 
-interface CustomProperty {
-	name: string;
-	value: string;
-}
-
 /**
  * Add the additional fields to the body
  *
  * @param {IDataObject} body The body object to add fields to
- * @param {IDataObject} additionalFields The fields to add
+ * @param customFieldCollection
  */
-function addAdditionalFields(body: IDataObject, additionalFields: IDataObject) {
-	for (const key of Object.keys(additionalFields)) {
-		if (
-			key === 'customFieldList' &&
-			(additionalFields.customFieldList as IDataObject).property !== undefined
-		) {
-			for (const customProperty of (additionalFields.customFieldList as IDataObject)
-				.property! as CustomProperty[]) {
-				body[customProperty.name] = customProperty.value;
-			}
-		} else {
-			body[key] = additionalFields[key];
-		}
+function addAdditionalFields(customFieldCollection: any) {
+	const customFields = [];
+
+	for (const customField of customFieldCollection.customFields) {
+		customFields.push({
+			customField: customField.name,
+			k: customField.name,
+			v: customField.v,
+		});
 	}
+
+	return customFields;
 }
 
 export class MagnetCustomer implements INodeType {
@@ -442,11 +435,7 @@ export class MagnetCustomer implements INodeType {
 						requestMethod = 'POST';
 						endpoint = '/deals';
 
-						body.title = this.getNodeParameter('title', i) as string;
-
-						const associateWith = this.getNodeParameter('associateWith', i) as
-							| 'organization'
-							| 'contact';
+						const associateWith = this.getNodeParameter('associateWith', i) as | 'organization' | 'contact';
 
 						if (associateWith === 'organization') {
 							body.organization = this.getNodeParameter('organization', i) as string;
@@ -454,8 +443,8 @@ export class MagnetCustomer implements INodeType {
 							body.contact = this.getNodeParameter('contact', i) as string;
 						}
 
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-						addAdditionalFields(body, additionalFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 					}
 					if (operation === 'delete') {
 						// ----------------------------------
@@ -488,9 +477,6 @@ export class MagnetCustomer implements INodeType {
 						if (!returnAll) {
 							qs.limit = this.getNodeParameter('limit', i);
 						}
-						const filters = this.getNodeParameter('filters', i);
-						addAdditionalFields(qs, filters);
-
 						endpoint = '/deals';
 					}
 					if (operation === 'update') {
@@ -503,8 +489,8 @@ export class MagnetCustomer implements INodeType {
 						const dealId = this.getNodeParameter('dealId', i) as number;
 						endpoint = `/deals/${dealId}`;
 
-						const updateFields = this.getNodeParameter('updateFields', i);
-						addAdditionalFields(body, updateFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 
 						if (body.label === 'null') {
 							body.label = null;
@@ -522,13 +508,6 @@ export class MagnetCustomer implements INodeType {
 						if (!returnAll) {
 							qs.limit = this.getNodeParameter('limit', i);
 						}
-
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-
-						if (additionalFields.status) {
-							qs.status = additionalFields.status as string;
-						}
-
 						endpoint = '/deals';
 					}
 				}
@@ -542,9 +521,8 @@ export class MagnetCustomer implements INodeType {
 						requestMethod = 'POST';
 						endpoint = '/organizations';
 
-						body.name = this.getNodeParameter('name', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-						addAdditionalFields(body, additionalFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 					}
 					if (operation === 'delete') {
 						// ----------------------------------
@@ -601,8 +579,8 @@ export class MagnetCustomer implements INodeType {
 						requestMethod = 'PUT';
 						endpoint = `/organizations/${id}`;
 
-						const updateFields = this.getNodeParameter('updateFields', i);
-						addAdditionalFields(body, updateFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 
 						if (body.label === 'null') {
 							body.label = null;
@@ -634,9 +612,8 @@ export class MagnetCustomer implements INodeType {
 						requestMethod = 'POST';
 						endpoint = '/contacts';
 
-						body.name = this.getNodeParameter('name', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-						addAdditionalFields(body, additionalFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 					}
 					if (operation === 'delete') {
 						// ----------------------------------
@@ -698,8 +675,8 @@ export class MagnetCustomer implements INodeType {
 						const contactId = this.getNodeParameter('contactId', i) as number;
 						endpoint = `/contacts/${contactId}`;
 
-						const updateFields = this.getNodeParameter('updateFields', i);
-						addAdditionalFields(body, updateFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 					}
 				}
 
@@ -712,9 +689,8 @@ export class MagnetCustomer implements INodeType {
 						requestMethod = 'POST';
 						endpoint = '/prospects';
 
-						body.name = this.getNodeParameter('name', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-						addAdditionalFields(body, additionalFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 					}
 					if (operation === 'delete') {
 						// ----------------------------------
@@ -776,8 +752,8 @@ export class MagnetCustomer implements INodeType {
 						const prospectId = this.getNodeParameter('prospectId', i) as number;
 						endpoint = `/prospects/${prospectId}`;
 
-						const updateFields = this.getNodeParameter('updateFields', i);
-						addAdditionalFields(body, updateFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 					}
 				}
 
@@ -790,9 +766,8 @@ export class MagnetCustomer implements INodeType {
 						requestMethod = 'POST';
 						endpoint = '/leads';
 
-						body.name = this.getNodeParameter('name', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-						addAdditionalFields(body, additionalFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 					}
 					if (operation === 'delete') {
 						// ----------------------------------
@@ -854,8 +829,8 @@ export class MagnetCustomer implements INodeType {
 						const leadId = this.getNodeParameter('leadId', i) as number;
 						endpoint = `/leads/${leadId}`;
 
-						const updateFields = this.getNodeParameter('updateFields', i);
-						addAdditionalFields(body, updateFields);
+						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
+						body.customFields = addAdditionalFields(customFieldCollection);
 					}
 				}
 
