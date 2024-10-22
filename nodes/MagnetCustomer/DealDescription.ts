@@ -316,7 +316,7 @@ export const dealFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: ['create', 'update'],
-				resource: ['customer'],
+				resource: ['deal'],
 			},
 		},
 		default: {},
