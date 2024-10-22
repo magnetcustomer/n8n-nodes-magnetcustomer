@@ -404,7 +404,7 @@ export const leadFields: INodeProperties[] = [
 				values: [
 					{
 						displayName: 'Property Name or ID',
-						name: 'customField',
+						name: '_id',
 						type: 'options',
 						typeOptions: {
 							loadOptionsMethod: 'getLeadCustomFields',

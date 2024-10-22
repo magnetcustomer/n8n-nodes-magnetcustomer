@@ -258,14 +258,14 @@ export function addPhones(collection: { phones?: [{ number: string }] }) {
 	return phones;
 }
 
-export function addCustomFields(collection: { customFields?: [{ name: string, v: string }] }) {
+export function addCustomFields(collection: { customFields?: [{ _id: string, v: string }] }) {
 	const customFields: Array<{ customField: any; k: any; v: any; }> = [];
 
 	if (!collection?.customFields) return customFields;
 
 	for (const customField of collection.customFields) {
 
-		const id = (customField.name.split("customField_"))[1];
+		const id = (customField._id.split("customField_"))[1];
 		customFields.push({
 			"customField": id,
 			"k": id,

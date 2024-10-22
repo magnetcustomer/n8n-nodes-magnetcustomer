@@ -327,7 +327,7 @@ export const dealFields: INodeProperties[] = [
 				values: [
 					{
 						displayName: 'Field Name or ID',
-						name: 'customField',
+						name: '_id',
 						type: 'options',
 						typeOptions: {
 							loadOptionsMethod: 'getDealCustomFields',
