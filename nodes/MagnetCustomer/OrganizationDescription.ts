@@ -57,7 +57,7 @@ export const organizationFields: INodeProperties[] = [
 	//         organization:delete
 	{
 		displayName: 'Organization ID',
-		name: 'organization',
+		name: 'organizationId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -73,7 +73,7 @@ export const organizationFields: INodeProperties[] = [
 	//         organization:get
 	{
 		displayName: 'Organization ID',
-		name: 'organization',
+		name: 'organizationId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -89,7 +89,7 @@ export const organizationFields: INodeProperties[] = [
 	//         organization:update
 	{
 		displayName: 'Organization ID',
-		name: 'organization',
+		name: 'organizationId',
 		type: 'string',
 		displayOptions: {
 			show: {

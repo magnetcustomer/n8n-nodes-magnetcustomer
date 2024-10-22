@@ -57,7 +57,7 @@ export const prospectFields: INodeProperties[] = [
 	//         prospect:delete
 	{
 		displayName: 'Contact ID',
-		name: 'prospect',
+		name: 'prospectId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -73,7 +73,7 @@ export const prospectFields: INodeProperties[] = [
 	//         prospect:get
 	{
 		displayName: 'Contact ID',
-		name: 'prospect',
+		name: 'prospectId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -89,7 +89,7 @@ export const prospectFields: INodeProperties[] = [
 	//         prospect:update
 	{
 		displayName: 'Contact ID',
-		name: 'prospect',
+		name: 'prospectId',
 		type: 'string',
 		displayOptions: {
 			show: {

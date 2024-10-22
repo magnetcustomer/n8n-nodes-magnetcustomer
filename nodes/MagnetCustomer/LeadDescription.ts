@@ -57,7 +57,7 @@ export const leadFields: INodeProperties[] = [
 	//         lead:delete
 	{
 		displayName: 'Contact ID',
-		name: 'lead',
+		name: 'leadId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -73,7 +73,7 @@ export const leadFields: INodeProperties[] = [
 	//         lead:get
 	{
 		displayName: 'Contact ID',
-		name: 'lead',
+		name: 'leadId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -89,7 +89,7 @@ export const leadFields: INodeProperties[] = [
 	//         lead:update
 	{
 		displayName: 'Contact ID',
-		name: 'lead',
+		name: 'leadId',
 		type: 'string',
 		displayOptions: {
 			show: {

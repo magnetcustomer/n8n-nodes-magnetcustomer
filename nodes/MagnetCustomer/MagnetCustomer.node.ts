@@ -1,18 +1,15 @@
 import type {
 	IDataObject,
 	IExecuteFunctions,
-	IHttpRequestMethods,
 	ILoadOptionsFunctions,
 	INodeExecutionData,
 	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import {LoggerProxy as Logger, NodeConnectionType} from 'n8n-workflow';
 
 import {
 	magnetCustomerApiRequest,
-	magnetCustomerApiRequestAllItems,
 	sortOptionParameters,
 } from './GenericFunctions';
 
@@ -20,27 +17,14 @@ import {customerFields, customerOperations} from './CustomerDescription';
 import {leadFields, leadOperations} from './LeadDescription';
 import {prospectFields, prospectOperations} from './ProspectDescription';
 import {dealFields, dealOperations} from './DealDescription';
+import {dealRequest} from './DealRequest';
 import {organizationFields, organizationOperations} from './OrganizationDescription';
+import {organizationRequest} from "./OrganizationRequest";
+import {customerRequest} from "./CustomerRequest";
+import {prospectRequest} from "./ProspectRequest";
+import {leadRequest} from "./LeadRequest";
+import {NodeConnectionType} from "n8n-workflow";
 
-/**
- * Add the additional fields to the body
- *
- * @param {IDataObject} body The body object to add fields to
- * @param customFieldCollection
- */
-function addAdditionalFields(customFieldCollection: any) {
-	const customFields = [];
-
-	for (const customField of customFieldCollection.customFields) {
-		customFields.push({
-			customField: customField.name,
-			k: customField.name,
-			v: customField.v,
-		});
-	}
-
-	return customFields;
-}
 
 export class MagnetCustomer implements INodeType {
 	description: INodeTypeDescription = {
@@ -391,456 +375,32 @@ export class MagnetCustomer implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
+		const length = items.length;
 
-		let body: IDataObject;
-		let qs: IDataObject;
-
-		let requestMethod: IHttpRequestMethods;
-		let endpoint: string;
-		let returnAll = false;
-
-		const resource = this.getNodeParameter('resource', 0);
-		const operation = this.getNodeParameter('operation', 0);
-
-		for (let i = 0; i < items.length; i++) {
-			requestMethod = 'GET';
-			endpoint = '';
-			body = {};
-			qs = {};
-
+		for (let i = 0; i < length; i++) {
 			try {
-				if (resource === 'deal') {
-					if (operation === 'create') {
-						// ----------------------------------
-						//         deal:create
-						// ----------------------------------
-
-						requestMethod = 'POST';
-						endpoint = '/deals';
-
-						const associateWith = this.getNodeParameter('associateWith', i) as | 'organization' | 'contact';
-
-						if (associateWith === 'organization') {
-							body.organization = this.getNodeParameter('organization', i) as string;
-						} else {
-							body.contact = this.getNodeParameter('contact', i) as string;
-						}
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-					}
-					if (operation === 'delete') {
-						// ----------------------------------
-						//         deal:delete
-						// ----------------------------------
-
-						requestMethod = 'DELETE';
-
-						const dealId = this.getNodeParameter('dealId', i) as number;
-						endpoint = `/deals/${dealId}`;
-					}
-					if (operation === 'get') {
-						// ----------------------------------
-						//         deal:get
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						const dealId = this.getNodeParameter('dealId', i) as number;
-						endpoint = `/deals/${dealId}`;
-					}
-					if (operation === 'getAll') {
-						// ----------------------------------
-						//         deal:getAll
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-						endpoint = '/deals';
-					}
-					if (operation === 'update') {
-						// ----------------------------------
-						//         deal:update
-						// ----------------------------------
-
-						requestMethod = 'PUT';
-
-						const dealId = this.getNodeParameter('dealId', i) as number;
-						endpoint = `/deals/${dealId}`;
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-
-						if (body.label === 'null') {
-							body.label = null;
-						}
-					}
-					if (operation === 'search') {
-						// ----------------------------------
-						//         deal:search
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						qs.search = this.getNodeParameter('term', i) as string;
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-						endpoint = '/deals';
-					}
-				}
-
-				if (resource === 'organization') {
-					if (operation === 'create') {
-						// ----------------------------------
-						//         organization:create
-						// ----------------------------------
-
-						requestMethod = 'POST';
-						endpoint = '/organizations';
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-					}
-					if (operation === 'delete') {
-						// ----------------------------------
-						//         organization:delete
-						// ----------------------------------
-
-						requestMethod = 'DELETE';
-
-						const organizationId = this.getNodeParameter('organizationId', i) as number;
-						endpoint = `/organizations/${organizationId}`;
-					}
-					if (operation === 'get') {
-						// ----------------------------------
-						//         organization:get
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						const organizationId = this.getNodeParameter('organizationId', i) as number;
-						endpoint = `/organizations/${organizationId}`;
-					}
-					if (operation === 'getAll') {
-						// ----------------------------------
-						//         organization:getAll
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-
-						const filters = this.getNodeParameter('filters', i);
-
-						if (filters.filterId) {
-							qs.filter_id = filters.filterId as string;
-						}
-
-						if (filters.firstChar) {
-							qs.first_char = filters.firstChar as string;
-							qs.first_char = qs.first_char.substring(0, 1);
-						}
-
-						endpoint = '/organizations';
-					}
-					if (operation === 'update') {
-						// ----------------------------------
-						//         organization:update
-						// ----------------------------------
-
-						const id = this.getNodeParameter('organizationId', i) as string;
-
-						requestMethod = 'PUT';
-						endpoint = `/organizations/${id}`;
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-
-						if (body.label === 'null') {
-							body.label = null;
-						}
-					}
-					if (operation === 'search') {
-						// ----------------------------------
-						//         organization:search
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						qs.search = this.getNodeParameter('term', i) as string;
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-
-						endpoint = '/organizations';
-					}
-				}
-
-				if (resource === 'customer') {
-					if (operation === 'create') {
-						// ----------------------------------
-						//         contact:create
-						// ----------------------------------
-
-						requestMethod = 'POST';
-						endpoint = '/import/contacts';
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-					}
-					if (operation === 'delete') {
-						// ----------------------------------
-						//         contact:delete
-						// ----------------------------------
-
-						requestMethod = 'DELETE';
-
-						const contactId = this.getNodeParameter('contactId', i) as number;
-						endpoint = `/contacts/${contactId}`;
-					}
-					if (operation === 'get') {
-						// ----------------------------------
-						//         contact:get
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						const contactId = this.getNodeParameter('contactId', i) as number;
-						endpoint = `/contacts/${contactId}`;
-					}
-					if (operation === 'getAll') {
-						// ----------------------------------
-						//         contact:getAll
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-
-						endpoint = '/contacts';
-					}
-					if (operation === 'search') {
-						// ----------------------------------
-						//         contacts:search
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						qs.search = this.getNodeParameter('term', i) as string;
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-
-
-						endpoint = '/contacts';
-					}
-					if (operation === 'update') {
-						// ----------------------------------
-						//         contact:update
-						// ----------------------------------
-
-						requestMethod = 'PUT';
-
-						const contactId = this.getNodeParameter('contactId', i) as number;
-						endpoint = `/contacts/${contactId}`;
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-					}
-				}
-
-				if (resource === 'prospect') {
-					if (operation === 'create') {
-						// ----------------------------------
-						//         contact:create
-						// ----------------------------------
-
-						requestMethod = 'POST';
-						endpoint = 'import/prospects';
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-					}
-					if (operation === 'delete') {
-						// ----------------------------------
-						//         prospect:delete
-						// ----------------------------------
-
-						requestMethod = 'DELETE';
-
-						const prospectId = this.getNodeParameter('prospectId', i) as number;
-						endpoint = `/prospects/${prospectId}`;
-					}
-					if (operation === 'get') {
-						// ----------------------------------
-						//         prospect:get
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						const prospectId = this.getNodeParameter('prospectId', i) as number;
-						endpoint = `/prospects/${prospectId}`;
-					}
-					if (operation === 'getAll') {
-						// ----------------------------------
-						//         prospect:getAll
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-
-						endpoint = '/prospects';
-					}
-					if (operation === 'search') {
-						// ----------------------------------
-						//         prospects:search
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						qs.search = this.getNodeParameter('term', i) as string;
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-
-
-						endpoint = '/prospects';
-					}
-					if (operation === 'update') {
-						// ----------------------------------
-						//         prospect:update
-						// ----------------------------------
-
-						requestMethod = 'PUT';
-
-						const prospectId = this.getNodeParameter('prospectId', i) as number;
-						endpoint = `/prospects/${prospectId}`;
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-					}
-				}
-
-				if (resource === 'lead') {
-					if (operation === 'create') {
-						// ----------------------------------
-						//         contact:create
-						// ----------------------------------
-
-						requestMethod = 'POST';
-						endpoint = '/import/leads';
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-					}
-					if (operation === 'delete') {
-						// ----------------------------------
-						//         lead:delete
-						// ----------------------------------
-
-						requestMethod = 'DELETE';
-
-						const leadId = this.getNodeParameter('leadId', i) as number;
-						endpoint = `/leads/${leadId}`;
-					}
-					if (operation === 'get') {
-						// ----------------------------------
-						//         lead:get
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						const leadId = this.getNodeParameter('leadId', i) as number;
-						endpoint = `/leads/${leadId}`;
-					}
-					if (operation === 'getAll') {
-						// ----------------------------------
-						//         lead:getAll
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-
-						endpoint = '/leads';
-					}
-					if (operation === 'search') {
-						// ----------------------------------
-						//         leads:search
-						// ----------------------------------
-
-						requestMethod = 'GET';
-
-						qs.search = this.getNodeParameter('term', i) as string;
-						returnAll = this.getNodeParameter('returnAll', i);
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						}
-
-
-						endpoint = '/leads';
-					}
-					if (operation === 'update') {
-						// ----------------------------------
-						//         lead:update
-						// ----------------------------------
-
-						requestMethod = 'PUT';
-
-						const leadId = this.getNodeParameter('leadId', i) as number;
-						endpoint = `/leads/${leadId}`;
-
-						const customFieldCollection = this.getNodeParameter('customFieldCollection', i);
-						body.customFields = addAdditionalFields(customFieldCollection);
-					}
-				}
-
-				Logger.debug(`requestMethod:: ${requestMethod}`);
-				Logger.debug(`endpoint:: ${endpoint}`);
-				Logger.debug(`body:: ${JSON.stringify(body)}`);
-				Logger.debug(`qs:: ${JSON.stringify(qs)}`);
-
+				const resource = this.getNodeParameter('resource', 0);
+				const operation = this.getNodeParameter('operation', 0);
 				let responseData;
-				if (returnAll) {
-					responseData = await magnetCustomerApiRequestAllItems.call(
-						this,
-						requestMethod,
-						endpoint,
-						body,
-						qs,
-					);
-				} else {
-					// if (customFieldList !== undefined) magnetCustomerEncodeCustomProperties(customFieldList, body);
 
-					responseData = await magnetCustomerApiRequest.call(
-						this,
-						requestMethod,
-						endpoint,
-						body,
-						qs,
-					);
+				switch (resource) {
+					case 'deal':
+						responseData = await dealRequest.call(this, operation, i);
+						break;
+					case 'organization':
+						responseData = await organizationRequest.call(this, operation, i);
+						break;
+					case 'customer':
+						responseData = await customerRequest.call(this, operation, i);
+						break;
+					case 'prospect':
+						responseData = await prospectRequest.call(this, operation, i);
+						break;
+					case 'lead':
+						responseData = await leadRequest.call(this, operation, i);
+						break;
+					default:
+						break;
 				}
 
 				const executionData = this.helpers.constructExecutionMetaData(this.helpers.returnJsonArray(responseData as IDataObject), {itemData: {item: i}},);
@@ -854,12 +414,6 @@ export class MagnetCustomer implements INodeType {
 				throw error;
 			}
 		}
-
-		// if (customFieldList !== undefined) {
-		// 	for (const item of returnData) {
-		// 		magnetCustomerResolveCustomFields(customFieldList, item);
-		// 	}
-		// }
 
 		return [returnData];
 	}

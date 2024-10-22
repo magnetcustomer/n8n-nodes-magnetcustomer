@@ -57,7 +57,7 @@ export const customerFields: INodeProperties[] = [
 	//         customer:delete
 	{
 		displayName: 'Contact ID',
-		name: 'customer',
+		name: 'customerId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -73,7 +73,7 @@ export const customerFields: INodeProperties[] = [
 	//         customer:get
 	{
 		displayName: 'Contact ID',
-		name: 'customer',
+		name: 'customerId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -89,7 +89,7 @@ export const customerFields: INodeProperties[] = [
 	//         customer:update
 	{
 		displayName: 'Contact ID',
-		name: 'customer',
+		name: 'customerId',
 		type: 'string',
 		displayOptions: {
 			show: {

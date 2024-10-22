@@ -57,7 +57,7 @@ export const dealFields: INodeProperties[] = [
 	//         deal:delete
 	{
 		displayName: 'Deal ID',
-		name: 'deal',
+		name: 'dealId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -73,7 +73,7 @@ export const dealFields: INodeProperties[] = [
 	//         deal:get
 	{
 		displayName: 'Deal ID',
-		name: 'deal',
+		name: 'dealId',
 		type: 'string',
 		displayOptions: {
 			show: {
@@ -89,7 +89,7 @@ export const dealFields: INodeProperties[] = [
 	//         deal:update
 	{
 		displayName: 'Deal ID',
-		name: 'deal',
+		name: 'dealId',
 		type: 'string',
 		displayOptions: {
 			show: {
