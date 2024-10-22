@@ -57,13 +57,13 @@ export async function magnetCustomerApiRequest(
 		method,
 		qs,
 		body,
-		uri: uri ?? `https://platform-api.${credentials.subDomainAccount}.magnetcustomer.com${resource}`,
+		uri: uri ?? `https://${credentials.subDomainAccount}.platform-api.magnetcustomer.com/api${resource}`,
 		json: true,
 		headers: {
 			api: 'n8n',
 		},
 		qsStringifyOptions: {
-			arrayFormat: 'brackets',
+			arrayFormat: 'repeat',
 		},
 	};
 

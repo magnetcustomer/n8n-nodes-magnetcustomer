@@ -20,7 +20,9 @@ import {
 	sortOptionParameters,
 } from './GenericFunctions';
 
-import {contactFields, contactOperations} from './ContactDescription';
+import {customerFields, customerOperations} from './CustomerDescription';
+import {leadFields, leadOperations} from './LeadDescription';
+import {prospectFields, prospectOperations} from './ProspectDescription';
 import {dealFields, dealOperations} from './DealDescription';
 import {organizationFields, organizationOperations} from './OrganizationDescription';
 
@@ -109,60 +111,76 @@ export class MagnetCustomer implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Contact',
-						value: 'contact',
+						name: 'Customer',
+						value: 'customer',
 					},
 					{
 						name: 'Deal',
 						value: 'deal',
 					},
 					{
+						name: 'Lead',
+						value: 'lead',
+					},
+					{
 						name: 'Organization',
 						value: 'organization',
 					},
+					{
+						name: 'Prospect',
+						value: 'prospect',
+					},
 				],
-				default: 'contact',
+				default: 'deal',
 			},
 
-			...contactOperations,
-			...contactFields,
+			...customerOperations,
+			...customerFields,
+
+			...leadOperations,
+			...leadFields,
+
+			...prospectOperations,
+			...prospectFields,
+
 			...dealOperations,
 			...dealFields,
+
 			...organizationOperations,
 			...organizationFields,
 
 			// ----------------------------------
-			//         activity / deal / note / organization / person / product
+			//         activity / deal / note / organization / contact / product
 			// ----------------------------------
 			{
-				displayName: 'Resolve Properties',
-				name: 'resolveProperties',
+				displayName: 'Resolve Custom Fields',
+				name: 'resolveCustomFields',
 				type: 'boolean',
 				displayOptions: {
 					show: {
-						resource: ['activity', 'deal', 'organization', 'person', 'product'],
+						resource: ['customer', 'deal', 'organization', 'prospect', 'lead'],
 						operation: ['get', 'getAll'],
 					},
 				},
 				default: false,
 				// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
 				description:
-					'By default do custom properties get returned only as ID instead of their actual name. Also option fields contain only the ID instead of their actual value. If this option gets set they get automatically resolved.',
+					'By default do custom fields get returned only as ID instead of their actual name. Also option fields contain only the ID instead of their actual value. If this option gets set they get automatically resolved.',
 			},
 			{
-				displayName: 'Encode Properties',
-				name: 'encodeProperties',
+				displayName: 'Encode Custom Fields',
+				name: 'encodeCustomFields',
 				type: 'boolean',
 				displayOptions: {
 					show: {
-						resource: ['activity', 'deal', 'organization', 'person', 'product'],
+						resource: ['customer', 'deal', 'organization', 'prospect', 'lead'],
 						operation: ['update'],
 					},
 				},
 				default: false,
 				// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
 				description:
-					'By default do custom properties have to be set as ID instead of their actual name. Also option fields have to be set as ID instead of their actual value. If this option gets set they get automatically encoded.',
+					'By default do custom fields have to be set as ID instead of their actual name. Also option fields have to be set as ID instead of their actual value. If this option gets set they get automatically encoded.',
 			},
 			{
 				displayName: 'Return All',
@@ -207,6 +225,7 @@ export class MagnetCustomer implements INodeType {
 
 				return sortOptionParameters(data.map(({_id, fullname}) => ({value: _id, name: fullname})));
 			},
+
 			// Get all Deals to display them to user so that they can
 			// select them easily
 			async getDeals(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -215,6 +234,7 @@ export class MagnetCustomer implements INodeType {
 				};
 				return sortOptionParameters(data.map(({_id, title}) => ({value: _id, name: title})));
 			},
+
 			// Get all Contacts to display them to user so that they can
 			// select them easily
 			async getContacts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -258,6 +278,7 @@ export class MagnetCustomer implements INodeType {
 
 				return sortOptionParameters(returnData);
 			},
+
 			// Get all Stages to display them to user so that they can
 			// select them easily
 			async getStageIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -291,6 +312,7 @@ export class MagnetCustomer implements INodeType {
 
 				return sortOptionParameters(returnData);
 			},
+
 			// Get all the Deal Custom Fields to display them to user so that they can
 			// select them easily
 			async getDealCustomFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -309,12 +331,54 @@ export class MagnetCustomer implements INodeType {
 
 				return sortOptionParameters(returnData);
 			},
-			// Get all the Person Custom Fields to display them to user so that they can
+
+			// Get all the Customer Custom Fields to display them to user so that they can
 			// select them easily
-			async getContactCustomFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+			async getCustomerCustomFields(this: ILoadOptionsFunctions,): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
 				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
 					"creatable": true,
+					"creatableWhen": 'contact',
+					"feature": 'contact',
+					"subFieldSettings.active": false,
+				});
+				for (const field of data) {
+					returnData.push({
+						name: field.name,
+						value: `customField_${field._id}`,
+					});
+				}
+
+				return sortOptionParameters(returnData);
+			},
+
+			// Get all the Prospect Custom Fields to display them to user so that they can
+			// select them easily
+			async getProspectCustomFields(this: ILoadOptionsFunctions,): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
+					"creatable": true,
+					"creatableWhen": 'prospect',
+					"feature": 'contact',
+					"subFieldSettings.active": false,
+				});
+				for (const field of data) {
+					returnData.push({
+						name: field.name,
+						value: `customField_${field._id}`,
+					});
+				}
+
+				return sortOptionParameters(returnData);
+			},
+
+			// Get all the Lead Custom Fields to display them to user so that they can
+			// select them easily
+			async getLeadCustomFields(this: ILoadOptionsFunctions,): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+				const {data} = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {
+					"creatable": true,
+					"creatableWhen": 'lead',
 					"feature": 'contact',
 					"subFieldSettings.active": false,
 				});
@@ -377,12 +441,12 @@ export class MagnetCustomer implements INodeType {
 
 						const associateWith = this.getNodeParameter('associateWith', i) as
 							| 'organization'
-							| 'person';
+							| 'contact';
 
 						if (associateWith === 'organization') {
-							body.org_id = this.getNodeParameter('org_id', i) as string;
+							body.organization = this.getNodeParameter('organization', i) as string;
 						} else {
-							body.person_id = this.getNodeParameter('person_id', i) as string;
+							body.contact = this.getNodeParameter('contact', i) as string;
 						}
 
 						const additionalFields = this.getNodeParameter('additionalFields', i);
@@ -448,37 +512,22 @@ export class MagnetCustomer implements INodeType {
 
 						requestMethod = 'GET';
 
-						qs.term = this.getNodeParameter('term', i) as string;
+						qs.search = this.getNodeParameter('term', i) as string;
 						returnAll = this.getNodeParameter('returnAll', i);
-						qs.exact_match = this.getNodeParameter('exactMatch', i) as boolean;
 						if (!returnAll) {
 							qs.limit = this.getNodeParameter('limit', i);
 						}
 
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
-						if (additionalFields.fields) {
-							qs.fields = (additionalFields.fields as string[]).join(',');
-						}
-
-						if (additionalFields.organizationId) {
-							qs.organization_id = parseInt(additionalFields.organizationId as string, 10);
-						}
-
-						if (additionalFields.includeFields) {
-							qs.include_fields = additionalFields.includeFields as string;
-						}
-
-						if (additionalFields.personId) {
-							qs.person_id = parseInt(additionalFields.personId as string, 10);
-						}
 						if (additionalFields.status) {
 							qs.status = additionalFields.status as string;
 						}
 
-						endpoint = '/deals/search';
+						endpoint = '/deals';
 					}
 				}
+
 				if (resource === 'organization') {
 					if (operation === 'create') {
 						// ----------------------------------
@@ -561,35 +610,24 @@ export class MagnetCustomer implements INodeType {
 
 						requestMethod = 'GET';
 
-						qs.term = this.getNodeParameter('term', i) as string;
+						qs.search = this.getNodeParameter('term', i) as string;
 						returnAll = this.getNodeParameter('returnAll', i);
 						if (!returnAll) {
 							qs.limit = this.getNodeParameter('limit', i);
 						}
 
-						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject & {
-							fields?: string[];
-						};
-
-						if (additionalFields?.fields?.length) {
-							qs.fields = additionalFields.fields.join(',');
-						}
-
-						if (additionalFields.exactMatch) {
-							qs.exact_match = additionalFields.exactMatch as boolean;
-						}
-
-						endpoint = '/organizations/search';
+						endpoint = '/organizations';
 					}
 				}
-				if (resource === 'contact') {
+
+				if (resource === 'customer') {
 					if (operation === 'create') {
 						// ----------------------------------
-						//         person:create
+						//         contact:create
 						// ----------------------------------
 
 						requestMethod = 'POST';
-						endpoint = '/persons';
+						endpoint = '/contacts';
 
 						body.name = this.getNodeParameter('name', i) as string;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
@@ -597,27 +635,27 @@ export class MagnetCustomer implements INodeType {
 					}
 					if (operation === 'delete') {
 						// ----------------------------------
-						//         person:delete
+						//         contact:delete
 						// ----------------------------------
 
 						requestMethod = 'DELETE';
 
-						const personId = this.getNodeParameter('personId', i) as number;
-						endpoint = `/persons/${personId}`;
+						const contactId = this.getNodeParameter('contactId', i) as number;
+						endpoint = `/contacts/${contactId}`;
 					}
 					if (operation === 'get') {
 						// ----------------------------------
-						//         person:get
+						//         contact:get
 						// ----------------------------------
 
 						requestMethod = 'GET';
 
-						const personId = this.getNodeParameter('personId', i) as number;
-						endpoint = `/persons/${personId}`;
+						const contactId = this.getNodeParameter('contactId', i) as number;
+						endpoint = `/contacts/${contactId}`;
 					}
 					if (operation === 'getAll') {
 						// ----------------------------------
-						//         person:getAll
+						//         contact:getAll
 						// ----------------------------------
 
 						requestMethod = 'GET';
@@ -627,71 +665,192 @@ export class MagnetCustomer implements INodeType {
 							qs.limit = this.getNodeParameter('limit', i);
 						}
 
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-
-						if (additionalFields.filterId) {
-							qs.filter_id = additionalFields.filterId as string;
-						}
-
-						if (additionalFields.firstChar) {
-							qs.first_char = additionalFields.firstChar as string;
-						}
-
-						if (additionalFields.sort) {
-							qs.sort = additionalFields.sort as string;
-						}
-
-						endpoint = '/persons';
+						endpoint = '/contacts';
 					}
 					if (operation === 'search') {
 						// ----------------------------------
-						//         persons:search
+						//         contacts:search
 						// ----------------------------------
 
 						requestMethod = 'GET';
 
-						qs.term = this.getNodeParameter('term', i) as string;
+						qs.search = this.getNodeParameter('term', i) as string;
 						returnAll = this.getNodeParameter('returnAll', i);
 						if (!returnAll) {
 							qs.limit = this.getNodeParameter('limit', i);
 						}
 
-						const additionalFields = this.getNodeParameter('additionalFields', i);
 
-						if (additionalFields.fields) {
-							qs.fields = additionalFields.fields as string;
-						}
-
-						if (additionalFields.exactMatch) {
-							qs.exact_match = additionalFields.exactMatch as boolean;
-						}
-
-						if (additionalFields.organizationId) {
-							qs.organization_id = parseInt(additionalFields.organizationId as string, 10);
-						}
-
-						if (additionalFields.includeFields) {
-							qs.include_fields = additionalFields.includeFields as string;
-						}
-
-						endpoint = '/persons/search';
+						endpoint = '/contacts';
 					}
 					if (operation === 'update') {
 						// ----------------------------------
-						//         person:update
+						//         contact:update
 						// ----------------------------------
 
 						requestMethod = 'PUT';
 
-						const personId = this.getNodeParameter('personId', i) as number;
-						endpoint = `/persons/${personId}`;
+						const contactId = this.getNodeParameter('contactId', i) as number;
+						endpoint = `/contacts/${contactId}`;
 
 						const updateFields = this.getNodeParameter('updateFields', i);
 						addAdditionalFields(body, updateFields);
+					}
+				}
 
-						if (body.label === 'null') {
-							body.label = null;
+				if (resource === 'prospect') {
+					if (operation === 'create') {
+						// ----------------------------------
+						//         contact:create
+						// ----------------------------------
+
+						requestMethod = 'POST';
+						endpoint = '/prospects';
+
+						body.name = this.getNodeParameter('name', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i);
+						addAdditionalFields(body, additionalFields);
+					}
+					if (operation === 'delete') {
+						// ----------------------------------
+						//         prospect:delete
+						// ----------------------------------
+
+						requestMethod = 'DELETE';
+
+						const prospectId = this.getNodeParameter('prospectId', i) as number;
+						endpoint = `/prospects/${prospectId}`;
+					}
+					if (operation === 'get') {
+						// ----------------------------------
+						//         prospect:get
+						// ----------------------------------
+
+						requestMethod = 'GET';
+
+						const prospectId = this.getNodeParameter('prospectId', i) as number;
+						endpoint = `/prospects/${prospectId}`;
+					}
+					if (operation === 'getAll') {
+						// ----------------------------------
+						//         prospect:getAll
+						// ----------------------------------
+
+						requestMethod = 'GET';
+
+						returnAll = this.getNodeParameter('returnAll', i);
+						if (!returnAll) {
+							qs.limit = this.getNodeParameter('limit', i);
 						}
+
+						endpoint = '/prospects';
+					}
+					if (operation === 'search') {
+						// ----------------------------------
+						//         prospects:search
+						// ----------------------------------
+
+						requestMethod = 'GET';
+
+						qs.search = this.getNodeParameter('term', i) as string;
+						returnAll = this.getNodeParameter('returnAll', i);
+						if (!returnAll) {
+							qs.limit = this.getNodeParameter('limit', i);
+						}
+
+
+						endpoint = '/prospects';
+					}
+					if (operation === 'update') {
+						// ----------------------------------
+						//         prospect:update
+						// ----------------------------------
+
+						requestMethod = 'PUT';
+
+						const prospectId = this.getNodeParameter('prospectId', i) as number;
+						endpoint = `/prospects/${prospectId}`;
+
+						const updateFields = this.getNodeParameter('updateFields', i);
+						addAdditionalFields(body, updateFields);
+					}
+				}
+
+				if (resource === 'lead') {
+					if (operation === 'create') {
+						// ----------------------------------
+						//         contact:create
+						// ----------------------------------
+
+						requestMethod = 'POST';
+						endpoint = '/leads';
+
+						body.name = this.getNodeParameter('name', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i);
+						addAdditionalFields(body, additionalFields);
+					}
+					if (operation === 'delete') {
+						// ----------------------------------
+						//         lead:delete
+						// ----------------------------------
+
+						requestMethod = 'DELETE';
+
+						const leadId = this.getNodeParameter('leadId', i) as number;
+						endpoint = `/leads/${leadId}`;
+					}
+					if (operation === 'get') {
+						// ----------------------------------
+						//         lead:get
+						// ----------------------------------
+
+						requestMethod = 'GET';
+
+						const leadId = this.getNodeParameter('leadId', i) as number;
+						endpoint = `/leads/${leadId}`;
+					}
+					if (operation === 'getAll') {
+						// ----------------------------------
+						//         lead:getAll
+						// ----------------------------------
+
+						requestMethod = 'GET';
+
+						returnAll = this.getNodeParameter('returnAll', i);
+						if (!returnAll) {
+							qs.limit = this.getNodeParameter('limit', i);
+						}
+
+						endpoint = '/leads';
+					}
+					if (operation === 'search') {
+						// ----------------------------------
+						//         leads:search
+						// ----------------------------------
+
+						requestMethod = 'GET';
+
+						qs.search = this.getNodeParameter('term', i) as string;
+						returnAll = this.getNodeParameter('returnAll', i);
+						if (!returnAll) {
+							qs.limit = this.getNodeParameter('limit', i);
+						}
+
+
+						endpoint = '/leads';
+					}
+					if (operation === 'update') {
+						// ----------------------------------
+						//         lead:update
+						// ----------------------------------
+
+						requestMethod = 'PUT';
+
+						const leadId = this.getNodeParameter('leadId', i) as number;
+						endpoint = `/leads/${leadId}`;
+
+						const updateFields = this.getNodeParameter('updateFields', i);
+						addAdditionalFields(body, updateFields);
 					}
 				}
 
@@ -716,10 +875,7 @@ export class MagnetCustomer implements INodeType {
 					);
 				}
 
-				const executionData = this.helpers.constructExecutionMetaData(
-					this.helpers.returnJsonArray(responseData as IDataObject),
-					{itemData: {item: i}},
-				);
+				const executionData = this.helpers.constructExecutionMetaData(this.helpers.returnJsonArray(responseData as IDataObject), {itemData: {item: i}},);
 				returnData.push(...executionData);
 
 			} catch (error: any) {
