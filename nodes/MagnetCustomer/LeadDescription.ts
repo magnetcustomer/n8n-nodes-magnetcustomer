@@ -368,7 +368,19 @@ export const leadFields: INodeProperties[] = [
 		},
 		description: 'The cep of the contact',
 	},
-
+	{
+		displayName: 'Owners',
+		name: 'owners',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['lead'],
+			},
+		},
+		description: 'The owners of the contact',
+	},
 	{
 		displayName: 'Custom Fields',
 		name: 'customFieldCollection',

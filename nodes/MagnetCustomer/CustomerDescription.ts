@@ -368,6 +368,19 @@ export const customerFields: INodeProperties[] = [
 		},
 		description: 'The cep of the contact',
 	},
+	{
+		displayName: 'Owners',
+		name: 'owners',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['customer'],
+			},
+		},
+		description: 'The owners of the contact',
+	},
 
 	{
 		displayName: 'Custom Fields',
@@ -391,7 +404,7 @@ export const customerFields: INodeProperties[] = [
 				displayName: 'Custom Field',
 				values: [
 					{
-						displayName: 'Property Name or ID',
+						displayName: 'Field Name or ID',
 						name: 'customField',
 						type: 'options',
 						typeOptions: {

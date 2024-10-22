@@ -54,60 +54,6 @@ export const organizationOperations: INodeProperties[] = [
 ];
 
 export const organizationFields: INodeProperties[] = [
-	//         organization:create
-	{
-		displayName: 'Additional Fields',
-		name: 'additionalFields',
-		type: 'collection',
-		placeholder: 'Add Field',
-		displayOptions: {
-			show: {
-				operation: ['create'],
-				resource: ['organization'],
-			},
-		},
-		default: {},
-		options: [
-			{
-				displayName: 'Custom Properties',
-				name: 'customProperties',
-				placeholder: 'Add Custom Property',
-				description: 'Adds a custom property to set also values which have not been predefined',
-				type: 'fixedCollection',
-				typeOptions: {
-					multipleValues: true,
-				},
-				default: {},
-				options: [
-					{
-						name: 'property',
-						displayName: 'Property',
-						values: [
-							{
-								displayName: 'Property Name or ID',
-								name: 'name',
-								type: 'options',
-								typeOptions: {
-									loadOptionsMethod: 'getOrganizationCustomFields',
-								},
-								default: '',
-								description:
-									'Name of the property to set. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
-							},
-							{
-								displayName: 'Property Value',
-								name: 'value',
-								type: 'string',
-								default: '',
-								description: 'Value of the property to set',
-							},
-						],
-					},
-				],
-			},
-		],
-	},
-
 	//         organization:delete
 	{
 		displayName: 'Organization ID',
@@ -155,53 +101,245 @@ export const organizationFields: INodeProperties[] = [
 		required: true,
 		description: 'ID of the organization to update',
 	},
+
+	//         organization:fields
 	{
-		displayName: 'Update Fields',
-		name: 'updateFields',
-		type: 'collection',
-		placeholder: 'Add Field',
+		displayName: 'Source',
+		name: 'source',
+		type: 'hidden',
+		default: 'n8n',
+		required: true,
+		description: 'The source of the contact',
+	},
+	{
+		displayName: 'Fullname',
+		name: 'fullname',
+		type: 'string',
+		default: '',
+		required: true,
 		displayOptions: {
 			show: {
-				operation: ['update'],
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The fullname of the contact',
+	},
+	{
+		displayName: 'E-Mail',
+		name: 'email',
+		type: 'string',
+		placeholder: 'name@email.com',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The e-mail of the contact',
+	},
+	{
+		displayName: 'Phones',
+		name: 'phoneCollection',
+		placeholder: 'Add Phone',
+		description: 'Adds a phone to set also values which have not been predefined',
+		type: 'fixedCollection',
+		typeOptions: {
+			multipleValues: true,
+		},
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
 				resource: ['organization'],
 			},
 		},
 		default: {},
 		options: [
 			{
-				displayName: 'Custom Properties',
-				name: 'customProperties',
-				placeholder: 'Add Custom Property',
-				description: 'Adds a custom property to set also values which have not been predefined',
-				type: 'fixedCollection',
-				typeOptions: {
-					multipleValues: true,
-				},
-				default: {},
-				options: [
+				name: 'phones',
+				displayName: 'Phone',
+				values: [
 					{
-						name: 'property',
-						displayName: 'Property',
-						values: [
-							{
-								displayName: 'Property Name or ID',
-								name: 'name',
-								type: 'options',
-								typeOptions: {
-									loadOptionsMethod: 'getOrganizationCustomFields',
-								},
-								default: '',
-								description:
-									'Name of the custom field to set. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
-							},
-							{
-								displayName: 'Property Value',
-								name: 'value',
-								type: 'string',
-								default: '',
-								description: 'Value of the property to set',
-							},
-						],
+						displayName: 'Number',
+						name: 'number',
+						type: 'string',
+						default: '',
+						description: 'Value of the phone to set',
+					},
+				],
+			},
+		],
+	},
+	{
+		displayName: 'Birthdate',
+		name: 'birthDate',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The birthdate of the contact',
+	},
+	{
+		displayName: 'Document (CPF/CNPJ)',
+		name: 'doc',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The document of the contact',
+	},
+	{
+		displayName: 'State',
+		name: 'state',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The state of the contact',
+	},
+	{
+		displayName: 'City',
+		name: 'city',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The city of the contact',
+	},
+	{
+		displayName: 'Address',
+		name: 'address',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The address of the contact',
+	},
+	{
+		displayName: 'Address Number',
+		name: 'addressNumber',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The address number of the contact',
+	},
+	{
+		displayName: 'Complement Address',
+		name: 'complement',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The complement address of the contact',
+	},
+	{
+		displayName: 'Neighborhood',
+		name: 'neighborhood',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The neighborhood of the contact',
+	},
+	{
+		displayName: 'CEP',
+		name: 'cep',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The cep of the contact',
+	},
+	{
+		displayName: 'Owners',
+		name: 'owners',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		description: 'The owners of the contact',
+	},
+
+	{
+		displayName: 'Custom Fields',
+		name: 'customFieldCollection',
+		placeholder: 'Add Custom Field',
+		description: 'Adds a custom field to set also values which have not been predefined',
+		type: 'fixedCollection',
+		typeOptions: {
+			multipleValues: true,
+		},
+		displayOptions: {
+			show: {
+				operation: ['create', 'update'],
+				resource: ['organization'],
+			},
+		},
+		default: {},
+		options: [
+			{
+				name: 'customFields',
+				displayName: 'Custom Field',
+				values: [
+					{
+						displayName: 'Field Name or ID',
+						name: 'customField',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getOrganizationCustomFields',
+						},
+						default: '',
+						description:
+							'Name of the field to set. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+					},
+					{
+						displayName: 'Field Value',
+						name: 'v',
+						type: 'string',
+						default: '',
+						description: 'Value of the field to set',
 					},
 				],
 			},
@@ -210,8 +348,8 @@ export const organizationFields: INodeProperties[] = [
 
 	//         organization:search
 	{
-		displayName: 'Term',
-		name: 'term',
+		displayName: 'Search',
+		name: 'search',
 		type: 'string',
 		required: true,
 		displayOptions: {
@@ -222,20 +360,6 @@ export const organizationFields: INodeProperties[] = [
 		},
 		default: '',
 		description:
-			'The search term to look for. Minimum 2 characters (or 1 if using exact_match).',
-	},
-	{
-		displayName: 'Exact Match',
-		name: 'exactMatch',
-		type: 'boolean',
-		displayOptions: {
-			show: {
-				operation: ['search'],
-				resource: ['organization'],
-			},
-		},
-		default: false,
-		description:
-			'Whether only full exact matches against the given term are returned. It is not case sensitive.',
+			'The search to look for. Minimum 3 characters.',
 	},
 ];
