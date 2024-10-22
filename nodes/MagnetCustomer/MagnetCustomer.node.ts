@@ -819,8 +819,8 @@ export class MagnetCustomer implements INodeType {
 
 				Logger.debug(`requestMethod:: ${requestMethod}`);
 				Logger.debug(`endpoint:: ${endpoint}`);
-				Logger.debug(`body:: ${body}`);
-				Logger.debug(`qs:: ${qs}`);
+				Logger.debug(`body:: ${JSON.stringify(body)}`);
+				Logger.debug(`qs:: ${JSON.stringify(qs)}`);
 
 				let responseData;
 				if (returnAll) {
