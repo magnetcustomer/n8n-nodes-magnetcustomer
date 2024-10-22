@@ -21,8 +21,8 @@ import {
 } from './GenericFunctions';
 
 import {customerFields, customerOperations} from './CustomerDescription';
-// import {leadFields, leadOperations} from './LeadDescription';
-// import {prospectFields, prospectOperations} from './ProspectDescription';
+import {leadFields, leadOperations} from './LeadDescription';
+import {prospectFields, prospectOperations} from './ProspectDescription';
 import {dealFields, dealOperations} from './DealDescription';
 import {organizationFields, organizationOperations} from './OrganizationDescription';
 
@@ -137,11 +137,11 @@ export class MagnetCustomer implements INodeType {
 			...customerOperations,
 			...customerFields,
 
-			// ...leadOperations,
-			// ...leadFields,
-			//
-			// ...prospectOperations,
-			// ...prospectFields,
+			...leadOperations,
+			...leadFields,
+
+			...prospectOperations,
+			...prospectFields,
 
 			...dealOperations,
 			...dealFields,
@@ -150,7 +150,7 @@ export class MagnetCustomer implements INodeType {
 			...organizationFields,
 
 			// ----------------------------------
-			//         activity / deal / note / organization / contact / product
+			//         deal / organization / contact
 			// ----------------------------------
 			{
 				displayName: 'Resolve Custom Fields',
@@ -302,6 +302,7 @@ export class MagnetCustomer implements INodeType {
 					"creatable": true,
 					"feature": 'organization',
 					"subFieldSettings.active": false,
+					"system": false,
 				});
 				for (const field of data) {
 					returnData.push({
@@ -321,6 +322,7 @@ export class MagnetCustomer implements INodeType {
 					"creatable": true,
 					"feature": 'deal',
 					"subFieldSettings.active": false,
+					"system": false,
 				});
 				for (const field of data) {
 					returnData.push({
@@ -341,6 +343,7 @@ export class MagnetCustomer implements INodeType {
 					"creatableWhen": 'contact',
 					"feature": 'contact',
 					"subFieldSettings.active": false,
+					"system": false,
 				});
 				for (const field of data) {
 					returnData.push({
@@ -361,6 +364,7 @@ export class MagnetCustomer implements INodeType {
 					"creatableWhen": 'prospect',
 					"feature": 'contact',
 					"subFieldSettings.active": false,
+					"system": false,
 				});
 				for (const field of data) {
 					returnData.push({
@@ -381,6 +385,7 @@ export class MagnetCustomer implements INodeType {
 					"creatableWhen": 'lead',
 					"feature": 'contact',
 					"subFieldSettings.active": false,
+					"system": false,
 				});
 				for (const field of data) {
 					returnData.push({
