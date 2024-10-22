@@ -7,31 +7,31 @@ import {
 } from "n8n-workflow";
 import {magnetCustomerApiRequest, magnetCustomerApiRequestAllItems} from "./GenericFunctions";
 
-function addPhones(collection: any) {
+function addPhones(collection: { phones?: [{ number: string }] }) {
 	const phones: Array<{ typePhone: string; number: any; }> = [];
 
-	if (!collection) return phones;
+	if (!collection?.phones) return phones;
 
 	for (const phone of collection.phones) {
-		phones.push({typePhone: 'business', number: phone});
+		phones.push({typePhone: 'business', number: phone.number});
 	}
 
 	return phones;
 }
 
-function addCustomFields(collection: any) {
+function addCustomFields(collection: { customFields?: [{ name: string, v: string }] }) {
 	const customFields: Array<{ customField: any; k: any; v: any; }> = [];
 
-	if (!collection) return customFields;
+	if (!collection?.customFields) return customFields;
 
 	for (const customField of collection.customFields) {
 
-			const id = (customField.name.split("customField_"))[1];
-			customFields.push({
-				"customField": id,
-				"k": id,
-				"v": customField.v,
-			});
+		const id = (customField.name.split("customField_"))[1];
+		customFields.push({
+			"customField": id,
+			"k": id,
+			"v": customField.v,
+		});
 
 	}
 
@@ -57,7 +57,7 @@ export async function leadRequest(
 				lifeCycle: this.getNodeParameter('lifeCycle', index),
 				fullname: this.getNodeParameter('fullname', index),
 				email: this.getNodeParameter('email', index),
-				phones: addPhones(this.getNodeParameter('phoneCollection', index)),
+				phones: addPhones(this.getNodeParameter('phoneCollection', index) as object),
 				type: this.getNodeParameter('type', index),
 				owners: [this.getNodeParameter('owners', index)],
 				address: this.getNodeParameter('address', index),
@@ -69,7 +69,7 @@ export async function leadRequest(
 				gender: this.getNodeParameter('gender', index),
 				birthDate: this.getNodeParameter('birthDate', index),
 				age: this.getNodeParameter('age', index),
-				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index)),
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
 				source: this.getNodeParameter('source', index),
 			};
 
@@ -89,7 +89,7 @@ export async function leadRequest(
 		case 'update':
 			requestMethod = 'PUT';
 			endpoint = `/leads/${this.getNodeParameter('leadId', index)}`;
-			body.customFields = addCustomFields(this.getNodeParameter('customFieldCollection', index));
+			body.customFields = addCustomFields(this.getNodeParameter('customFieldCollection', index) as object);
 			break;
 		case 'search':
 			requestMethod = 'GET';
