@@ -8,6 +8,7 @@ import type {
 	INodeTypeDescription,
 } from 'n8n-workflow';
 
+import {NodeConnectionType} from "n8n-workflow";
 import {
 	magnetCustomerApiRequest,
 	sortOptionParameters,
@@ -23,7 +24,6 @@ import {organizationRequest} from "./OrganizationRequest";
 import {customerRequest} from "./CustomerRequest";
 import {prospectRequest} from "./ProspectRequest";
 import {leadRequest} from "./LeadRequest";
-import {NodeConnectionType} from "n8n-workflow";
 
 
 export class MagnetCustomer implements INodeType {

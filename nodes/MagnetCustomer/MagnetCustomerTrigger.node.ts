@@ -4,9 +4,6 @@ import type {
 	INodeTypeDescription,
 } from 'n8n-workflow';
 
-import {
-	magnetCustomerApiRequest
-} from './GenericFunctions';
 
 
 import {
@@ -17,6 +14,9 @@ import {
 	NodeConnectionType
 } from "n8n-workflow";
 import basicAuth from "basic-auth";
+import {
+	magnetCustomerApiRequest
+} from './GenericFunctions';
 
 function authorizationError(resp: any, realm: string, responseCode: number, message?: string) {
 	if (message === undefined) {
