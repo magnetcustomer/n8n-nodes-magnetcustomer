@@ -1,6 +1,6 @@
 {
   "name": "@magnetcustomer/n8n-nodes-magnetcustomer",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Rest api for CRM Magnet customer",
   "keywords": [
     "n8n",
@@ -38,7 +38,8 @@
       "dist/credentials/MagnetCustomerOAuth2Api.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/MagnetCustomer/MagnetCustomer.node.js"
+      "dist/nodes/MagnetCustomer/MagnetCustomer.node.js",
+      "dist/nodes/MagnetCustomer/MagnetCustomerTrigger.node.js"
     ]
   },
   "devDependencies": {
