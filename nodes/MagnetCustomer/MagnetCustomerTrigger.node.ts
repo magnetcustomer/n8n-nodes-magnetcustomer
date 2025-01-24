@@ -45,7 +45,7 @@ export class MagnetCustomerTrigger implements INodeType {
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description: 'Starts the workflow when Magnet Customer events occur',
 		defaults: {
-			name: 'MagnetCustomerTrigger',
+			name: 'MagnetCustomer',
 		},
 		inputs: [],
 		outputs: [NodeConnectionType.Main],
