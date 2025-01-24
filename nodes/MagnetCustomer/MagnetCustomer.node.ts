@@ -105,6 +105,10 @@ export class MagnetCustomer implements INodeType {
 						name: 'Prospect',
 						value: 'prospect',
 					},
+					{
+						name: 'Task',
+						value: 'task',
+					},
 				],
 				default: 'deal',
 			},
