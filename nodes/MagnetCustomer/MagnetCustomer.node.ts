@@ -24,6 +24,8 @@ import {organizationRequest} from "./OrganizationRequest";
 import {customerRequest} from "./CustomerRequest";
 import {prospectRequest} from "./ProspectRequest";
 import {leadRequest} from "./LeadRequest";
+import {taskFields, taskOperations} from "./TaskDescription";
+import {taskRequest} from "./TaskRequest";
 
 
 export class MagnetCustomer implements INodeType {
@@ -116,11 +118,14 @@ export class MagnetCustomer implements INodeType {
 			...prospectOperations,
 			...prospectFields,
 
+			...organizationOperations,
+			...organizationFields,
+
 			...dealOperations,
 			...dealFields,
 
-			...organizationOperations,
-			...organizationFields,
+			...taskOperations,
+			...taskFields,
 
 			// ----------------------------------
 			//         deal / organization / contact
@@ -228,6 +233,23 @@ export class MagnetCustomer implements INodeType {
 						returnData.push({
 							name: user.fullname,
 							value: user._id,
+						});
+					}
+				}
+
+				return sortOptionParameters(returnData);
+			},
+
+			// Get all Task Types to display them to user so that they can
+			// select them easily
+			async getTaskTypeIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/tasks/types', {});
+				for (const type of data) {
+					if (type.active === true) {
+						returnData.push({
+							name: type.name,
+							value: type._id,
 						});
 					}
 				}
@@ -386,6 +408,9 @@ export class MagnetCustomer implements INodeType {
 				switch (resource) {
 					case 'deal':
 						responseData = await dealRequest.call(this, operation, i);
+						break;
+					case 'task':
+						responseData = await taskRequest.call(this, operation, i);
 						break;
 					case 'organization':
 						responseData = await organizationRequest.call(this, operation, i);
