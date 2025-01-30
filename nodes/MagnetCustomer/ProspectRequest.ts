@@ -103,6 +103,8 @@ export async function prospectRequest(
 			break;
 	}
 
+	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+
 	const {contact} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 	return contact;
 }

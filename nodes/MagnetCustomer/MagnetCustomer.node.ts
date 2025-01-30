@@ -163,36 +163,7 @@ export class MagnetCustomer implements INodeType {
 				// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
 				description:
 					'By default do custom fields have to be set as ID instead of their actual name. Also option fields have to be set as ID instead of their actual value. If this option gets set they get automatically encoded.',
-			},
-			{
-				displayName: 'Return All',
-				name: 'returnAll',
-				type: 'boolean',
-				displayOptions: {
-					show: {
-						operation: ['getAll'],
-					},
-				},
-				default: false,
-				description: 'Whether to return all results or only up to a given limit',
-			},
-			{
-				displayName: 'Limit',
-				name: 'limit',
-				type: 'number',
-				displayOptions: {
-					show: {
-						operation: ['getAll'],
-						returnAll: [false],
-					},
-				},
-				typeOptions: {
-					minValue: 1,
-					maxValue: 500,
-				},
-				default: 100,
-				description: 'Max number of results to return',
-			},
+			}
 		],
 	};
 
@@ -282,7 +253,10 @@ export class MagnetCustomer implements INodeType {
 			// select them easily
 			async getStageIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				const data = await magnetCustomerApiRequest.call(this, 'GET', '/stages', {});
+				const pipelineId = this.getNodeParameter('pipeline', 0) as string;
+				if (!pipelineId) return sortOptionParameters(returnData);
+
+				const data = await magnetCustomerApiRequest.call(this, 'GET', `/pipelines/${pipelineId}/stages`, {});
 				for (const stage of data) {
 					returnData.push({
 						name: `${(stage.pipeline || {}).title} > ${stage.name}`,

@@ -94,6 +94,9 @@ export async function organizationRequest(
 			break;
 	}
 
+	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+
 	const {organization} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-	return organization;}
+	return organization;
+}
 

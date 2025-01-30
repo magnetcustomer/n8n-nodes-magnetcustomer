@@ -117,6 +117,8 @@ export async function taskRequest(
 			break;
 	}
 
+	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+
 	const {task} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 	return task;
 }
