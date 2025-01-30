@@ -7,8 +7,7 @@ import {
 import {
 	addCustomFields,
 	addPhones,
-	magnetCustomerApiRequest,
-	magnetCustomerApiRequestAllItems
+	magnetCustomerApiRequest
 } from "./GenericFunctions";
 
 export async function leadRequest(
@@ -19,7 +18,7 @@ export async function leadRequest(
 	let requestMethod;
 	let endpoint;
 	let body: IDataObject = {};
-	const qs: IDataObject = {};
+	let qs: IDataObject = {};
 
 
 	switch (operation) {
@@ -61,6 +60,10 @@ export async function leadRequest(
 		case 'getAll':
 			requestMethod = 'GET';
 			endpoint = '/leads';
+			qs = {
+				page: this.getNodeParameter('page', index),
+				limit: this.getNodeParameter('limit', index),
+			};
 			break;
 		case 'update':
 			requestMethod = 'PUT';
@@ -91,13 +94,15 @@ export async function leadRequest(
 		case 'search':
 			requestMethod = 'GET';
 			endpoint = '/leads';
-			qs.search = this.getNodeParameter('search', index) as string;
+			qs = {
+				page: this.getNodeParameter('page', index),
+				limit: this.getNodeParameter('limit', index),
+				search: this.getNodeParameter('search', index) as string,
+			};
 			break;
 		default:
 			break;
 	}
-
-	if (operation === 'getAll') return magnetCustomerApiRequestAllItems.call(this, requestMethod, endpoint, body, qs,);
 
 	const {contact} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 	return contact;}

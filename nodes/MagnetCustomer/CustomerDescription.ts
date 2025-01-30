@@ -86,6 +86,38 @@ export const customerFields: INodeProperties[] = [
 		description: 'ID of the customer to get',
 	},
 
+	//         customer:getAll
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['customer'],
+			},
+		},
+		default: 1,
+		required: true,
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 15,
+		},
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['customer'],
+			},
+		},
+		default: 15,
+		required: true,
+		description: 'Max number of results to return',
+	},
+
 	//         customer:update
 	{
 		displayName: 'Contact ID',

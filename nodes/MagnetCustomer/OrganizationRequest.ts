@@ -7,8 +7,7 @@ import {
 import {
 	addCustomFields,
 	addPhones,
-	magnetCustomerApiRequest,
-	magnetCustomerApiRequestAllItems
+	magnetCustomerApiRequest
 } from "./GenericFunctions";
 
 
@@ -20,7 +19,7 @@ export async function organizationRequest(
 	let requestMethod;
 	let endpoint;
 	let body: IDataObject = {};
-	const qs: IDataObject = {};
+	let qs: IDataObject = {};
 
 
 	switch (operation) {
@@ -56,6 +55,10 @@ export async function organizationRequest(
 		case 'getAll':
 			requestMethod = 'GET';
 			endpoint = '/organizations';
+			qs = {
+				page: this.getNodeParameter('page', index),
+				limit: this.getNodeParameter('limit', index),
+			};
 			break;
 		case 'update':
 			requestMethod = 'PUT';
@@ -81,14 +84,15 @@ export async function organizationRequest(
 		case 'search':
 			requestMethod = 'GET';
 			endpoint = '/organizations';
-			qs.search = this.getNodeParameter('search', index) as string;
+			qs = {
+				page: this.getNodeParameter('page', index),
+				limit: this.getNodeParameter('limit', index),
+				search: this.getNodeParameter('search', index) as string,
+			};
 			break;
 		default:
 			break;
 	}
-
-
-	if (operation === 'getAll') return magnetCustomerApiRequestAllItems.call(this, requestMethod, endpoint, body, qs,);
 
 	const {organization} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 	return organization;}

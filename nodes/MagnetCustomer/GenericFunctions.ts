@@ -102,7 +102,9 @@ export async function magnetCustomerApiRequestAllItems(
 	if (query === undefined) {
 		query = {};
 	}
+
 	query.page = 1;
+	query.limit = 15;
 
 	const returnData: IDataObject[] = [];
 	let responseData;

@@ -86,6 +86,38 @@ export const organizationFields: INodeProperties[] = [
 		description: 'ID of the organization to get',
 	},
 
+	//         organization:getAll
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['organization'],
+			},
+		},
+		default: 1,
+		required: true,
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 15,
+		},
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['organization'],
+			},
+		},
+		default: 15,
+		required: true,
+		description: 'Max number of results to return',
+	},
+
 	//         organization:update
 	{
 		displayName: 'Organization ID',

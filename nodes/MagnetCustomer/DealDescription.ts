@@ -86,6 +86,38 @@ export const dealFields: INodeProperties[] = [
 		description: 'ID of the deal to get',
 	},
 
+	//         deal:getAll
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['deal'],
+			},
+		},
+		default: 1,
+		required: true,
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 15,
+		},
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['deal'],
+			},
+		},
+		default: 15,
+		required: true,
+		description: 'Max number of results to return',
+	},
+
 	//         deal:update
 	{
 		displayName: 'Deal ID',

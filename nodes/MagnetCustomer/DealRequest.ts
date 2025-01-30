@@ -6,8 +6,7 @@ import {
 } from "n8n-workflow";
 import {
 	addCustomFields,
-	magnetCustomerApiRequest,
-	magnetCustomerApiRequestAllItems
+	magnetCustomerApiRequest
 } from "./GenericFunctions";
 
 export async function dealRequest(
@@ -18,7 +17,7 @@ export async function dealRequest(
 	let requestMethod;
 	let endpoint;
 	let body: IDataObject = {};
-	const qs: IDataObject = {};
+	let qs: IDataObject = {};
 
 
 	switch (operation) {
@@ -59,6 +58,10 @@ export async function dealRequest(
 		case 'getAll':
 			requestMethod = 'GET';
 			endpoint = '/deals';
+			qs = {
+				page: this.getNodeParameter('page', index),
+				limit: this.getNodeParameter('limit', index),
+			};
 			break;
 		case 'update':
 			requestMethod = 'PUT';
@@ -89,14 +92,17 @@ export async function dealRequest(
 		case 'search':
 			requestMethod = 'GET';
 			endpoint = '/deals';
-			qs.search = this.getNodeParameter('search', index) as string;
+			qs = {
+				page: this.getNodeParameter('page', index),
+				limit: this.getNodeParameter('limit', index),
+				search: this.getNodeParameter('search', index) as string,
+			};
 			break;
 		default:
 			break;
 	}
 
-	if (operation === 'getAll') return magnetCustomerApiRequestAllItems.call(this, requestMethod, endpoint, body, qs,);
-
 	const {deal} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-	return deal;}
+	return deal;
+}
 

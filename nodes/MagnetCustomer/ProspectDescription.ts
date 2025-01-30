@@ -86,6 +86,38 @@ export const prospectFields: INodeProperties[] = [
 		description: 'ID of the prospect to get',
 	},
 
+	//         prospect:getAll
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['prospect'],
+			},
+		},
+		default: 1,
+		required: true,
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 15,
+		},
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['prospect'],
+			},
+		},
+		default: 15,
+		required: true,
+		description: 'Max number of results to return',
+	},
+
 	//         prospect:update
 	{
 		displayName: 'Contact ID',

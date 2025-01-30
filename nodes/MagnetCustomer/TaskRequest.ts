@@ -5,8 +5,7 @@ import {
 	ILoadOptionsFunctions,
 } from "n8n-workflow";
 import {
-	magnetCustomerApiRequest,
-	magnetCustomerApiRequestAllItems
+	magnetCustomerApiRequest
 } from "./GenericFunctions";
 
 export async function taskRequest(
@@ -17,7 +16,7 @@ export async function taskRequest(
 	let requestMethod;
 	let endpoint;
 	let body: IDataObject = {};
-	const qs: IDataObject = {};
+	let qs: IDataObject = {};
 
 
 	switch (operation) {
@@ -52,18 +51,26 @@ export async function taskRequest(
 			}
 
 			break;
+
 		case 'delete':
 			requestMethod = 'DELETE';
 			endpoint = `/tasks/${this.getNodeParameter('taskId', index)}`;
 			break;
+
 		case 'get':
 			requestMethod = 'GET';
 			endpoint = `/tasks/${this.getNodeParameter('taskId', index)}`;
 			break;
+
 		case 'getAll':
 			requestMethod = 'GET';
 			endpoint = '/tasks';
+			qs = {
+				page: this.getNodeParameter('page', index),
+				limit: this.getNodeParameter('limit', index),
+			};
 			break;
+
 		case 'update':
 			requestMethod = 'PUT';
 			endpoint = `/tasks/${this.getNodeParameter('taskId', index)}`;
@@ -95,17 +102,22 @@ export async function taskRequest(
 			}
 
 			break;
+
 		case 'search':
 			requestMethod = 'GET';
 			endpoint = '/tasks';
-			qs.search = this.getNodeParameter('search', index) as string;
+			qs = {
+				page: this.getNodeParameter('page', index),
+				limit: this.getNodeParameter('limit', index),
+				search: this.getNodeParameter('search', index) as string,
+			};
 			break;
+
 		default:
 			break;
 	}
 
-	if (operation === 'getAll') return magnetCustomerApiRequestAllItems.call(this, requestMethod, endpoint, body, qs,);
-
 	const {task} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-	return task;}
+	return task;
+}
 

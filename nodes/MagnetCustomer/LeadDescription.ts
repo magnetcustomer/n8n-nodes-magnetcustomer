@@ -86,6 +86,38 @@ export const leadFields: INodeProperties[] = [
 		description: 'ID of the lead to get',
 	},
 
+	//         lead:getAll
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['lead'],
+			},
+		},
+		default: 1,
+		required: true,
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 15,
+		},
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				resource: ['lead'],
+			},
+		},
+		default: 15,
+		required: true,
+		description: 'Max number of results to return',
+	},
+
 	//         lead:update
 	{
 		displayName: 'Contact ID',
