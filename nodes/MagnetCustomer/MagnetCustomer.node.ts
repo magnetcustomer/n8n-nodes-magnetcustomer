@@ -163,7 +163,7 @@ export class MagnetCustomer implements INodeType {
 				// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
 				description:
 					'By default do custom fields have to be set as ID instead of their actual name. Also option fields have to be set as ID instead of their actual value. If this option gets set they get automatically encoded.',
-			}
+			},
 		],
 	};
 
