@@ -11,6 +11,7 @@ import type {
 import {NodeConnectionType} from "n8n-workflow";
 import {
 	magnetCustomerApiRequest,
+	magnetCustomerApiRequestAllItems,
 	sortOptionParameters,
 } from './GenericFunctions';
 
@@ -26,6 +27,18 @@ import {prospectRequest} from "./ProspectRequest";
 import {leadRequest} from "./LeadRequest";
 import {taskFields, taskOperations} from "./TaskDescription";
 import {taskRequest} from "./TaskRequest";
+import { staffFields, staffOperations } from './StaffDescription';
+import { staffRequest } from './StaffRequest';
+import { workspaceFields, workspaceOperations } from './WorkspaceDescription';
+import { workspaceRequest } from './WorkspaceRequest';
+import { customFieldFields, customFieldOperations } from './CustomFieldDescription';
+import { customFieldRequest } from './CustomFieldRequest';
+import { customFieldBlockFields, customFieldBlockOperations } from './CustomFieldBlockDescription';
+import { customFieldBlockRequest } from './CustomFieldBlockRequest';
+import { customFieldTypeFields, customFieldTypeOperations } from './CustomFieldTypeDescription';
+import { customFieldTypeRequest } from './CustomFieldTypeRequest';
+import { pipelineFields, pipelineOperations } from './PipelineDescription';
+import { pipelineRequest } from './PipelineRequest';
 
 
 export class MagnetCustomer implements INodeType {
@@ -86,6 +99,18 @@ export class MagnetCustomer implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
+						name: 'Custom Field',
+						value: 'customField',
+					},
+					{
+						name: 'Custom Field Block',
+						value: 'customFieldBlock',
+					},
+					{
+						name: 'Custom Field Type',
+						value: 'customFieldType',
+					},
+					{
 						name: 'Customer',
 						value: 'customer',
 					},
@@ -102,12 +127,24 @@ export class MagnetCustomer implements INodeType {
 						value: 'organization',
 					},
 					{
+						name: 'Pipeline',
+						value: 'pipeline',
+					},
+					{
 						name: 'Prospect',
 						value: 'prospect',
 					},
 					{
+						name: 'Staff',
+						value: 'staff',
+					},
+					{
 						name: 'Task',
 						value: 'task',
+					},
+					{
+						name: 'Workspace',
+						value: 'workspace',
 					},
 				],
 				default: 'deal',
@@ -130,6 +167,24 @@ export class MagnetCustomer implements INodeType {
 
 			...taskOperations,
 			...taskFields,
+
+			...staffOperations,
+			...staffFields,
+
+			...workspaceOperations,
+			...workspaceFields,
+
+			...customFieldOperations,
+			...customFieldFields,
+
+			...customFieldBlockOperations,
+			...customFieldBlockFields,
+
+			...customFieldTypeOperations,
+			...customFieldTypeFields,
+
+			...pipelineOperations,
+			...pipelineFields,
 
 			// ----------------------------------
 			//         deal / organization / contact
@@ -254,6 +309,7 @@ export class MagnetCustomer implements INodeType {
 			async getStageIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
 				const pipelineId = this.getNodeParameter('pipeline', 0) as string;
+				console.log('Attempting to load stages for pipeline:', pipelineId);
 				if (!pipelineId) return sortOptionParameters(returnData);
 
 				const data = await magnetCustomerApiRequest.call(this, 'GET', `/pipelines/${pipelineId}/stages`, {});
@@ -369,6 +425,73 @@ export class MagnetCustomer implements INodeType {
 
 				return sortOptionParameters(returnData);
 			},
+
+			// Get all the Staff Custom Fields to display them to user so that they can
+			// select them easily
+			async getStaffCustomFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+				// Fetch custom fields for the 'staff' feature
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/customfields', {}, {
+					"creatable": true, // Assuming staff fields can be created
+					"feature": 'staff',
+					"subFieldSettings.active": false,
+					"system": false,
+				});
+				// Assuming response is an array of field objects
+				for (const field of data) {
+					returnData.push({
+						name: field.name,
+						value: field._id, // Use only the ID as value
+					});
+				}
+
+				return sortOptionParameters(returnData);
+			},
+
+			// Get all Custom Field Types to display them to user so that they can
+			// select them easily
+			async getCustomFieldTypes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+				// Endpoint from curl: /api/customfieldtypes
+				// Assuming it returns an array of objects like { _id: string, name: string, fieldType: string }
+				// or similar. We need the 'fieldType' value and a user-friendly name.
+				const data = await magnetCustomerApiRequest.call(this, 'GET', '/customfieldtypes', {}, {
+					// Add query parameters if needed (like limit to get all?)
+				});
+
+				// Adjust parsing based on actual API response structure
+				if (Array.isArray(data)) {
+					for (const fieldType of data) {
+						// Use fieldType.name or a combination for display, and fieldType.fieldType as the value
+						if (fieldType?.fieldType && fieldType.name && fieldType._id) {
+							returnData.push({
+								name: fieldType.name, // Or format as needed: `${fieldType.name} (${fieldType.fieldType})`
+								value: fieldType._id, // Use the ID as the value
+							});
+						}
+					}
+				}
+
+				return sortOptionParameters(returnData);
+			},
+
+			// Get all Roles to display them to user so that they can
+			// select them easily
+			async getRoles(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+				// Usar magnetCustomerApiRequestAllItems para buscar todas as roles
+				const roles = await magnetCustomerApiRequestAllItems.call(this, 'GET', '/api/roles'); // <-- Usar a função e o endpoint correto
+
+				// A função AllItems já deve retornar o array de itens
+				// Assumindo que cada item tem _id e name
+				for (const role of roles) {
+					if (role?._id && role.name) {
+						returnData.push({ name: role.name, value: role._id });
+					}
+				}
+
+				return sortOptionParameters(returnData);
+			},
 		},
 	};
 
@@ -401,6 +524,24 @@ export class MagnetCustomer implements INodeType {
 						break;
 					case 'lead':
 						responseData = await leadRequest.call(this, operation, i);
+						break;
+					case 'staff':
+						responseData = await staffRequest.call(this, operation, i);
+						break;
+					case 'workspace':
+						responseData = await workspaceRequest.call(this, operation, i);
+						break;
+					case 'customField':
+						responseData = await customFieldRequest.call(this, operation, i);
+						break;
+					case 'customFieldBlock':
+						responseData = await customFieldBlockRequest.call(this, operation, i);
+						break;
+					case 'customFieldType':
+						responseData = await customFieldTypeRequest.call(this, operation, i);
+						break;
+					case 'pipeline':
+						responseData = await pipelineRequest.call(this, operation, i);
 						break;
 					default:
 						break;

@@ -261,19 +261,21 @@ export function addPhones(collection: { phones?: [{ number: string }] }) {
 }
 
 export function addCustomFields(collection: { customFields?: [{ _id: string, v: string }] }) {
-	const customFields: Array<{ customField: any; k: any; v: any; }> = [];
+	const customFields: Array<{ customField: string; v: string; }> = [];
 
 	if (!collection?.customFields) return customFields;
 
 	for (const customField of collection.customFields) {
+		const id = customField._id;
 
-		const id = (customField._id.split("customField_"))[1];
-		customFields.push({
-			"customField": id,
-			"k": id,
-			"v": customField.v,
-		});
-
+		if (id && customField.v !== undefined) {
+			customFields.push({
+				"customField": id,
+				"v": customField.v,
+			});
+		} else {
+			console.warn('Skipping custom field entry due to missing ID or value:', customField);
+		}
 	}
 
 	return customFields;

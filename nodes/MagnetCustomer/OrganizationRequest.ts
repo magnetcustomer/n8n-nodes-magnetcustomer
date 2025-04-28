@@ -62,24 +62,48 @@ export async function organizationRequest(
 			break;
 		case 'update':
 			requestMethod = 'PUT';
-			endpoint = `/organizations/${this.getNodeParameter('organizationId', index)}`;
-			body = {
-				fullname: this.getNodeParameter('fullname', index),
-				email: this.getNodeParameter('email', index),
-				phones: addPhones(this.getNodeParameter('phoneCollection', index) as object),
-				birthDate: this.getNodeParameter('birthDate', index),
-				doc: this.getNodeParameter('doc', index),
-				state: this.getNodeParameter('state', index),
-				city: this.getNodeParameter('city', index),
-				address: this.getNodeParameter('address', index),
-				addressNumber: this.getNodeParameter('addressNumber', index),
-				complement: this.getNodeParameter('complement', index),
-				neighborhood: this.getNodeParameter('neighborhood', index),
-				cep: this.getNodeParameter('cep', index),
-				owners: [this.getNodeParameter('owners', index)],
-				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
-				source: this.getNodeParameter('source', index),
+			const organizationId = this.getNodeParameter('organizationId', index) as string;
+			endpoint = `/organizations/${organizationId}`;
+			body = {}; // Start with empty body for partial update
+
+			// Helper function to add parameter to body if it exists
+			const addParam = (paramName: string, bodyKey?: string) => {
+				const value = this.getNodeParameter(paramName, index);
+				if (value !== undefined && value !== null && value !== '') { // Check for non-empty/null values
+					body[bodyKey ?? paramName] = value;
+				}
 			};
+
+			// Add fields to body only if provided by the user
+			addParam('fullname');
+			addParam('email');
+			addParam('birthDate');
+			addParam('doc');
+			addParam('state');
+			addParam('city');
+			addParam('address');
+			addParam('addressNumber');
+			addParam('complement');
+			addParam('neighborhood');
+			addParam('cep');
+			addParam('source');
+
+			// Handle collections/arrays
+			const phones = this.getNodeParameter('phoneCollection', index) as any;
+			if (phones?.phones && phones.phones.length > 0) {
+				body.phones = addPhones(phones);
+			}
+
+			const owners = this.getNodeParameter('owners', index);
+			if (owners && owners !== '') { // Assuming owners is a single ID string for now
+				body.owners = [owners];
+			}
+
+			const customFields = this.getNodeParameter('customFieldCollection', index) as any;
+			if (customFields?.customFields && customFields.customFields.length > 0) {
+				body.customFields = addCustomFields(customFields);
+			}
+
 			break;
 		case 'search':
 			requestMethod = 'GET';
@@ -94,7 +118,19 @@ export async function organizationRequest(
 			break;
 	}
 
+	// Ajuste para Delete
+	if (operation === 'delete') {
+		await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+		return { success: true };
+	}
+
 	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+
+	// Ajuste para Update retornar o objeto organization
+	if (operation === 'update') {
+		const { organization } = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+		return organization;
+	}
 
 	const {organization} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 	return organization;
