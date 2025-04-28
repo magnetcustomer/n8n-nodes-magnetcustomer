@@ -269,10 +269,10 @@ export function addCustomFields(collection: { customFields?: [{ _id: string, v: 
 		const id = customField._id;
 
 		if (id && customField.v !== undefined) {
-			customFields.push({
-				"customField": id,
-				"v": customField.v,
-			});
+		customFields.push({
+			"customField": id,
+			"v": customField.v,
+		});
 		} else {
 			console.warn('Skipping custom field entry due to missing ID or value:', customField);
 		}

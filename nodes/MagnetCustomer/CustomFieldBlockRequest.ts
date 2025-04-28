@@ -36,7 +36,11 @@ export async function customFieldBlockRequest(
 				isExpanded: this.getNodeParameter('isExpanded', index, true) as boolean,
 				summaryDisplay: this.getNodeParameter('summaryDisplay', index, true) as boolean,
 			};
-			break;
+			// Send request for create
+			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+			// Log the raw response for create
+			console.log('Raw API Response (Create CustomFieldBlock):', JSON.stringify(response, null, 2));
+			return response; // Return the full response for create
 
 		case 'delete':
 			requestMethod = 'DELETE';
@@ -112,18 +116,19 @@ export async function customFieldBlockRequest(
 			throw new Error(`Operation '${operation}' not supported for Custom Field Block resource.`);
 	}
 
+	// Only GET, PUT, DELETE operations should reach here now
 	const responseData = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 
-	// Process response similar to custom fields
-	if (['create', 'update', 'get'].includes(operation)) {
-		return responseData;
-	}
-	else if (operation === 'getAll') {
+	// Process response for non-create operations
+	if (['update', 'get', 'getAll', 'search'].includes(operation)) {
 		return responseData;
 	}
 	else if (operation === 'delete') {
-		return { success: true };
+		// Keep existing delete behavior (assuming API confirms deletion)
+		// If the API returns something else on delete, adjust here.
+		// For now, assuming it doesn't return the deleted object itself.
+		return { success: true }; // Or return responseData if API returns useful info
 	}
 
-	return responseData;
+	return responseData; // Fallback
 } 

@@ -53,6 +53,13 @@ export async function pipelineRequest(this: IExecuteFunctions, operation: string
 		method = 'POST';
 		body.title = this.getNodeParameter('title', i) as string;
 		// Add other body parameters for creation if needed
+
+		// Send request for create
+		const response = await magnetCustomerApiRequest.call(this, method, endpoint, body, qs);
+		// Log the raw response for create
+		console.log('Raw API Response (Create Pipeline):', JSON.stringify(response, null, 2));
+		return response; // Return the full response for create
+
 	} else if (operation === 'update') {
 		const pipelineId = this.getNodeParameter('pipelineId', i) as string;
 		endpoint = `/pipelines/${pipelineId}`;
@@ -89,12 +96,25 @@ export async function pipelineRequest(this: IExecuteFunctions, operation: string
 		}
 
 		// body = updateFields; // Lógica antiga removida
+
+		// Send request for update and return the full response
+		return magnetCustomerApiRequest.call(this, method, endpoint, body, qs);
+
 	} else if (operation === 'delete') {
 		const pipelineId = this.getNodeParameter('pipelineId', i) as string;
 		endpoint = `/pipelines/${pipelineId}`;
 		method = 'DELETE';
+
+		// Send request for delete and return the full response
+		return magnetCustomerApiRequest.call(this, method, endpoint, body, qs);
 	}
 
-	// Make the single API request
-	return magnetCustomerApiRequest.call(this, method, endpoint, body, qs);
+	// Make the single API request (only for GET operations now)
+	// If operation was create, update, or delete, it would have returned already.
+	if (method === 'GET') {
+		return magnetCustomerApiRequest.call(this, method, endpoint, body, qs);
+	}
+
+	// Should not be reached if all operations are handled
+	return {}; // Return empty object as a fallback
 } 

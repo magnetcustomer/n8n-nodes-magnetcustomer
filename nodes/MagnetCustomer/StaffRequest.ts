@@ -59,7 +59,11 @@ export async function staffRequest(
 				// TODO: Ajustar a chamada de addCustomFields ou usar uma nova função
 				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index, {}) as any),
 			};
-			break;
+			// Send request for create
+			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+			// Log the raw response for create
+			console.log('Raw API Response (Create Staff):', JSON.stringify(response, null, 2));
+			return response; // Return the full response for create
 
 		case 'update':
 			requestMethod = 'PUT';
@@ -108,13 +112,12 @@ export async function staffRequest(
 			throw new Error(`Operação '${operation}' não suportada para o recurso Staff.`);
 	}
 
-	// Chama a função genérica para fazer a requisição
+	// Only GET, PUT, DELETE operations should reach here now
 	const responseData = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 
-	// TODO: Processar a responseData se necessário (ex: extrair um objeto específico em POST/PUT)
-	// A API POST /staffs retorna o objeto criado diretamente no corpo da resposta, sem aninhamento extra.
-	if (operation === 'create' || operation === 'update') {
-		 return responseData; // Retorna o objeto staff criado/atualizado diretamente
+	// Process response for non-create operations
+	if (operation === 'update' || operation === 'get' || operation === 'getAll' || operation === 'search') { // GET/getAll/search also handled here
+		 return responseData; // Retorna o objeto staff atualizado/encontrado diretamente
 	}
 
 	// Handle delete response
@@ -122,5 +125,5 @@ export async function staffRequest(
 		return { success: true }; // Assume success if no error thrown
 	}
 
-	return responseData;
+	return responseData; // Fallback
 } 

@@ -38,7 +38,11 @@ export async function customFieldRequest(
 				subFieldSettings: JSON.parse(this.getNodeParameter('subFieldSettings', index, '{}') as string),
 				settings: this.getNodeParameter('settings', index, {}) as object,
 			};
-			break;
+			// Send request for create
+			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+			// Log the raw response for create
+			console.log('Raw API Response (Create CustomField):', JSON.stringify(response, null, 2));
+			return response; // Return the full response for create
 
 		case 'delete':
 			requestMethod = 'DELETE';
@@ -120,16 +124,11 @@ export async function customFieldRequest(
 			throw new Error(`Operation '${operation}' not supported for Custom Field resource.`);
 	}
 
+	// Only GET, PUT, DELETE operations should reach here now
 	const responseData = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 
-	// Return the object directly for create/update/get
-	if (['create', 'update', 'get'].includes(operation)) {
-		return responseData;
-	}
-	// For getAll, the response might be paginated or nested (e.g., response.data)
-	// Assuming magnetCustomerApiRequest handles potential nesting or pagination might be needed
-	else if (operation === 'getAll') {
-		// Check response structure if necessary
+	// Process response for non-create operations
+	if (['update', 'get', 'getAll'].includes(operation)) { // Added 'search' if applicable, assuming getAll handles it
 		return responseData;
 	}
 	// Delete usually returns 204 No Content or similar, maybe return success status

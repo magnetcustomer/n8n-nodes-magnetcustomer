@@ -43,7 +43,12 @@ export async function organizationRequest(
 				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
 				source: this.getNodeParameter('source', index),
 			};
-			break;
+			// Send request for create
+			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+			// Log the raw response for create
+			console.log('Raw API Response (Create Organization):', JSON.stringify(response, null, 2));
+			return response; // Return the full response for create
+
 		case 'delete':
 			requestMethod = 'DELETE';
 			endpoint = `/organizations/${this.getNodeParameter('organizationId', index)}`;
@@ -118,21 +123,22 @@ export async function organizationRequest(
 			break;
 	}
 
-	// Ajuste para Delete
-	if (operation === 'delete') {
-		await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+	// Handle GET requests
+	if (['GET'].includes(String(requestMethod))) {
+		return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+	}
+
+	// Handle PUT (Update) and DELETE requests
+	if (operation === 'update') {
+		// Return the full response directly for update
+		return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+	} else if (operation === 'delete') {
+		// Keep existing delete behavior
+		await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 		return { success: true };
 	}
 
-	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-
-	// Ajuste para Update retornar o objeto organization
-	if (operation === 'update') {
-		const { organization } = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-		return organization;
-	}
-
-	const {organization} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-	return organization;
+	// Fallback/Default case (should ideally not be reached if all operations are handled)
+	return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 }
 

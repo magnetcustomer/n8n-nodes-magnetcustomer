@@ -50,7 +50,11 @@ export async function taskRequest(
 				body.status = this.getNodeParameter('status', index);
 			}
 
-			break;
+			// Send request for create
+			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+			// Log the raw response for create
+			console.log('Raw API Response (Create Task):', JSON.stringify(response, null, 2));
+			return response; // Return the full response for create
 
 		case 'delete':
 			requestMethod = 'DELETE';
@@ -124,21 +128,22 @@ export async function taskRequest(
 			break;
 	}
 
-	// Ajuste para Delete
-	if (operation === 'delete') {
-		await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
+	// Handle GET requests
+	if (['GET'].includes(String(requestMethod))) {
+		return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+	}
+
+	// Handle PUT (Update) and DELETE requests
+	if (operation === 'update') {
+		// Return the full response directly for update
+		return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+	} else if (operation === 'delete') {
+		// Keep existing delete behavior
+		await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 		return { success: true };
 	}
 
-	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-
-	// Ajuste para Update retornar o objeto task
-	if (operation === 'update') {
-		const { task } = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-		return task;
-	}
-
-	const {task} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-	return task;
+	// Fallback/Default case (should ideally not be reached if all operations are handled)
+	return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 }
 

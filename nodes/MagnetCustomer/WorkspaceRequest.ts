@@ -64,7 +64,11 @@ export async function workspaceRequest(
 				name: this.getNodeParameter('name', index) as string,
 			};
 			// qs não é necessário para POST
-			break;
+			// Send request for create
+			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+			// Log the raw response for create
+			console.log('Raw API Response (Create Workspace):', JSON.stringify(response, null, 2));
+			return response; // Return the full response for create
 
 		case 'update':
 			requestMethod = 'PUT';
@@ -91,10 +95,11 @@ export async function workspaceRequest(
 			throw new Error(`Operação '${operation}' não suportada para o recurso Workspace.`);
 	}
 
+	// Only GET, PUT, DELETE should reach here now
 	const responseData = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 
-	// Assumindo que POST/PUT retorna o objeto criado/atualizado
-	if (operation === 'create' || operation === 'update') {
+	// Assumindo que PUT retorna o objeto atualizado
+	if (operation === 'update' || operation === 'get' || operation === 'getAll' || operation === 'search') { // GET/getAll/search also handled here
 		return responseData;
 	}
 
@@ -103,5 +108,5 @@ export async function workspaceRequest(
 		return { success: true }; // Assume success if no error thrown
 	}
 
-	return responseData;
+	return responseData; // Fallback
 } 
