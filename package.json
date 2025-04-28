@@ -1,6 +1,6 @@
 {
   "name": "@magnetcustomer/n8n-nodes-magnetcustomer",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Rest api for CRM Magnet customer",
   "keywords": [
     "n8n",

@@ -46,7 +46,14 @@ export async function dealRequest(
 			if (this.getNodeParameter('stage', index)) {
 				body.stage = this.getNodeParameter('stage', index);
 			}
-			break;
+
+			// Send request
+			const response = await magnetCustomerApiRequest.call(this, 'POST', endpoint, body, qs);
+
+			// Log the raw response
+			console.log('Raw API Response:', JSON.stringify(response, null, 2));
+
+			return response;
 		case 'delete':
 			requestMethod = 'DELETE';
 			endpoint = `/deals/${this.getNodeParameter('dealId', index)}`;
@@ -105,7 +112,9 @@ export async function dealRequest(
 				body.customFields = addCustomFields(customFields);
 			}
 
-			break;
+			// Send request
+			return magnetCustomerApiRequest.call(this, 'PUT', endpoint, body, qs); // Return the full response directly
+
 		case 'search':
 			requestMethod = 'GET';
 			endpoint = '/deals';
@@ -119,21 +128,9 @@ export async function dealRequest(
 			break;
 	}
 
-	// Ajuste para Delete
-	if (operation === 'delete') {
-		await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-		return { success: true };
-	}
-
-	// Ajuste para Update retornar o objeto deal
-	if (operation === 'update') {
-		const { deal } = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-		return deal;
-	}
-
 	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 
-	const {deal} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-	return deal;
+	// For POST, PUT, DELETE, return the full response
+	return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 }
 
