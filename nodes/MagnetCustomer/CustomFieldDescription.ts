@@ -39,6 +39,12 @@ export const customFieldOperations: INodeProperties[] = [
 				action: 'Get many custom fields',
 			},
 			{
+				name: 'Search',
+				value: 'search',
+				description: 'Search custom fields',
+				action: 'Search custom fields',
+			},
+			{
 				name: 'Update',
 				value: 'update',
 				description: 'Update a custom field',
@@ -73,7 +79,7 @@ export const customFieldFields: INodeProperties[] = [
 		type: 'string',
 		displayOptions: {
 			show: {
-				operation: ['getAll'],
+				operation: ['getAll', 'search'],
 				resource: ['customField'],
 			},
 		},
@@ -88,7 +94,7 @@ export const customFieldFields: INodeProperties[] = [
 		default: {},
 		displayOptions: {
 			show: {
-				operation: ['getAll'],
+				operation: ['getAll', 'search'],
 				resource: ['customField'],
 			},
 		},
@@ -165,7 +171,7 @@ export const customFieldFields: INodeProperties[] = [
 		default: {},
 		displayOptions: {
 			show: {
-				operation: ['getAll'],
+				operation: ['getAll', 'search'],
 				resource: ['customField'],
 			},
 		},

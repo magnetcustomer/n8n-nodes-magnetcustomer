@@ -39,6 +39,12 @@ export const customFieldBlockOperations: INodeProperties[] = [
 				action: 'Get many custom field blocks',
 			},
 			{
+				name: 'Search',
+				value: 'search',
+				description: 'Search custom field blocks',
+				action: 'Search custom field blocks',
+			},
+			{
 				name: 'Update',
 				value: 'update',
 				description: 'Update a custom field block',

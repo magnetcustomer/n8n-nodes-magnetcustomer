@@ -55,6 +55,7 @@ export async function customFieldRequest(
 			break;
 
 		case 'getAll':
+		case 'search':
 			requestMethod = 'GET';
 			endpoint = '/customfields';
 			qs = {

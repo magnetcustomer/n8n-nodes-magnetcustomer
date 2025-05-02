@@ -40,6 +40,12 @@ export const pipelineOperations: INodeProperties[] = [
 				action: 'Get many pipelines',
 			},
 			{
+				name: 'Search',
+				value: 'search',
+				description: 'Search for pipelines',
+				action: 'Search for pipelines',
+			},
+			{
 				name: 'Update',
 				value: 'update',
 				description: 'Update a pipeline',
@@ -112,7 +118,7 @@ export const pipelineFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['pipeline'],
-				operation: ['getAll'],
+				operation: ['getAll', 'search'],
 				returnAll: [false],
 			},
 		},
@@ -171,7 +177,7 @@ export const pipelineFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['pipeline'],
-				operation: ['getAll'],
+				operation: ['getAll', 'search'],
 				returnAll: [false],
 			},
 		},

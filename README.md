@@ -12,7 +12,7 @@
 
 # n8n-nodes-magnetcustomer
 
-This is a [N8n](https://community.n8n.io) community node. It allows you to use [Magnet Customer API](https://apireference.magnetcustomer.com) api to communicate with CRM Magnet Customer in your workflow.
+This is a [N8n](https://community.n8n.io) community node. It allows you to use [Magnet Customer API](https://developers.magnetcustomer.com) api to communicate with CRM Magnet Customer in your workflow.
 
 ## Available Resources
 
@@ -26,14 +26,14 @@ This node provides operations for the following Magnet Customer resources:
 *   **Task** (Get, Get Many, Search, Create, Update, Delete)
 *   **Staff** (Get, Get Many, Search, Create, Update, Delete) - Including loading Roles and Custom Fields.
 *   **Workspace** (Get, Get Many, Search, Create, Update, Delete)
-*   **Pipeline** (Get, Get Many, Create, Update, Delete) - Including filtering, sorting, and detailed updates with stages.
-*   **Custom Field** (Get, Get Many, Create, Update, Delete)
-*   **Custom Field Block** (Get, Get Many, Create, Update, Delete)
-*   **Custom Field Type** (Get, Get Many)
+*   **Pipeline** (Get, Get Many, Search, Create, Update, Delete) - Including filtering, sorting, and detailed updates with stages.
+*   **Custom Field** (Get, Get Many, Search, Create, Update, Delete)
+*   **Custom Field Block** (Get, Get Many, Search, Create, Update, Delete)
+*   **Custom Field Type** (Get, Get Many, Search)
 
 # Compatibility
 
-Tested on n8n version 1.90.2
+Tested on n8n version 1.62.0
 
 # License
 [MIT](./LICENSE.md)

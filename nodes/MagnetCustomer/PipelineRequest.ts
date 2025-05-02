@@ -107,6 +107,12 @@ export async function pipelineRequest(this: IExecuteFunctions, operation: string
 
 		// Send request for delete and return the full response
 		return magnetCustomerApiRequest.call(this, method, endpoint, body, qs);
+	} else if (operation === 'search') {
+		method = 'GET';
+		endpoint = '/pipelines';
+		// qs já contém limit, filtros e sort da lógica de getAll
+		// A única diferença é que o campo 'search' dentro de filters será usado
+		// (A lógica de getAll já pega o search de dentro de filters)
 	}
 
 	// Make the single API request (only for GET operations now)
