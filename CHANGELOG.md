@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.4] - 2025-10-06
+
+### Changed
+
+*   Paginação opcional em todos os resources (Get Many e Search): `page`/`limit` deixaram de ser obrigatórios nos forms e, quando `0` ou não preenchidos, não são enviados ao backend.
+*   Atualizados os forms de Search para incluir `page`/`limit` em: Deal, Customer, Organization, Lead, Task, Prospect, Staff. Em `CustomField`, `limit` também ficou disponível em Search.
+
+### Fixed
+
+*   Search de Deals: corrigido envio de `page` indefinido que causava erro "Error extra { "parameterName": "page" }". Agora `page`/`limit` só são enviados quando informados (> 0).
+
 ## [1.7.0] - 2025-04-28
 
 ### Added
