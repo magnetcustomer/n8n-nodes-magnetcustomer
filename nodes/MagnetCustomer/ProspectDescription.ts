@@ -97,8 +97,7 @@ export const prospectFields: INodeProperties[] = [
 				resource: ['prospect'],
 			},
 		},
-		default: 1,
-		required: true,
+		default: 0,
 	},
 	{
 		displayName: 'Limit',
@@ -113,8 +112,7 @@ export const prospectFields: INodeProperties[] = [
 				resource: ['prospect'],
 			},
 		},
-		default: 15,
-		required: true,
+		default: 0,
 		description: 'Max number of results to return',
 	},
 
@@ -473,6 +471,36 @@ export const prospectFields: INodeProperties[] = [
 		default: '',
 		description:
 			'The search to look for. Minimum 3 characters.',
+	},
+
+	//         prospect:search pagination
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				operation: ['search'],
+				resource: ['prospect'],
+			},
+		},
+		default: 0,
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 15,
+		},
+		displayOptions: {
+			show: {
+				operation: ['search'],
+				resource: ['prospect'],
+			},
+		},
+		default: 0,
+		description: 'Max number of results to return',
 	},
 
 ];

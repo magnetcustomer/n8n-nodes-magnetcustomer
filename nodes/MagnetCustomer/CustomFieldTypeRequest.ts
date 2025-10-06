@@ -19,11 +19,15 @@ export async function customFieldTypeRequest(
 	let qs: IDataObject = {};
 
 	if (operation === 'getAll' || operation === 'search') {
-		qs = {
-			page: this.getNodeParameter('page', index, 1) as number,
-			limit: this.getNodeParameter('limit', index, 15) as number,
-			search: operation === 'search' ? this.getNodeParameter('search', index, '') : '',
-		};
+		qs = {};
+		const page = this.getNodeParameter('page', index, undefined) as number | undefined;
+		const limit = this.getNodeParameter('limit', index, undefined) as number | undefined;
+		if (typeof page === 'number' && page > 0) qs.page = page;
+		if (typeof limit === 'number' && limit > 0) qs.limit = limit;
+		if (operation === 'search') {
+			const search = this.getNodeParameter('search', index, '') as string;
+			if (search) qs.search = search;
+		}
 
 		// Add optional filters
 		const filters = this.getNodeParameter('filters', index, {}) as {

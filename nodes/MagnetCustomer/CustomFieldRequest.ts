@@ -58,12 +58,13 @@ export async function customFieldRequest(
 		case 'search':
 			requestMethod = 'GET';
 			endpoint = '/customfields';
-			qs = {
-				limit: this.getNodeParameter('limit', index, 50) as number,
-				// TODO: Add pagination if API supports it (page? offset?)
-				page: this.getNodeParameter('page', index, 1) as number,
-				search: this.getNodeParameter('search', index, '') as string,
-			};
+			qs = {};
+			const page = this.getNodeParameter('page', index, undefined) as number | undefined;
+			const limit = this.getNodeParameter('limit', index, undefined) as number | undefined;
+			if (typeof page === 'number' && page > 0) qs.page = page;
+			if (typeof limit === 'number' && limit > 0) qs.limit = limit;
+			const search = this.getNodeParameter('search', index, '') as string;
+			if (search) qs.search = search;
 			const filters = this.getNodeParameter('filters', index, {}) as {
 				feature?: string;
 				creatableWhen?: string;

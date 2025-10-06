@@ -97,8 +97,7 @@ export const taskFields: INodeProperties[] = [
 				resource: ['task'],
 			},
 		},
-		default: 1,
-		required: true,
+		default: 0,
 	},
 	{
 		displayName: 'Limit',
@@ -113,8 +112,7 @@ export const taskFields: INodeProperties[] = [
 				resource: ['task'],
 			},
 		},
-		default: 15,
-		required: true,
+		default: 0,
 		description: 'Max number of results to return',
 	},
 
@@ -339,5 +337,35 @@ export const taskFields: INodeProperties[] = [
 		default: '',
 		description:
 			'The search to look for. Minimum 3 characters.',
+	},
+
+	//         task:search pagination
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				operation: ['search'],
+				resource: ['task'],
+			},
+		},
+		default: 0,
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 15,
+		},
+		displayOptions: {
+			show: {
+				operation: ['search'],
+				resource: ['task'],
+			},
+		},
+		default: 0,
+		description: 'Max number of results to return',
 	},
 ];

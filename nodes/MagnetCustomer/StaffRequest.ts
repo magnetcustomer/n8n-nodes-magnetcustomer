@@ -29,21 +29,24 @@ export async function staffRequest(
 		case 'getAll':
 			requestMethod = 'GET';
 			endpoint = '/staffs';
-			qs = {
-				page: this.getNodeParameter('page', index, 1), // Adiciona valor padrão 1
-				limit: this.getNodeParameter('limit', index, 15), // Adiciona valor padrão 15
-				// TODO: Adicionar outros parâmetros de query suportados pela API (e.g., search)
-			};
+			qs = {};
+			const pageGetAll = this.getNodeParameter('page', index, undefined) as number | undefined;
+			const limitGetAll = this.getNodeParameter('limit', index, undefined) as number | undefined;
+			if (typeof pageGetAll === 'number' && pageGetAll > 0) qs.page = pageGetAll;
+			if (typeof limitGetAll === 'number' && limitGetAll > 0) qs.limit = limitGetAll;
+			// TODO: Adicionar outros parâmetros de query suportados pela API (e.g., search)
 			break;
 
 		case 'search': // Novo caso para Search
 			requestMethod = 'GET';
 			endpoint = '/staffs';
-			qs = {
-				page: this.getNodeParameter('page', index, 1),
-				limit: this.getNodeParameter('limit', index, 15),
-				search: this.getNodeParameter('search', index, '') as string, // Pega o parâmetro search
-			};
+			qs = {};
+			const pageSearch = this.getNodeParameter('page', index, undefined) as number | undefined;
+			const limitSearch = this.getNodeParameter('limit', index, undefined) as number | undefined;
+			if (typeof pageSearch === 'number' && pageSearch > 0) qs.page = pageSearch;
+			if (typeof limitSearch === 'number' && limitSearch > 0) qs.limit = limitSearch;
+			const search = this.getNodeParameter('search', index, '') as string;
+			if (search) qs.search = search;
 			break;
 
 		case 'create':

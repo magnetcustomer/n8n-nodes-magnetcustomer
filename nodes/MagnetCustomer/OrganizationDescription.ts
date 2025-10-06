@@ -97,8 +97,7 @@ export const organizationFields: INodeProperties[] = [
 				resource: ['organization'],
 			},
 		},
-		default: 1,
-		required: true,
+		default: 0,
 	},
 	{
 		displayName: 'Limit',
@@ -113,8 +112,7 @@ export const organizationFields: INodeProperties[] = [
 				resource: ['organization'],
 			},
 		},
-		default: 15,
-		required: true,
+		default: 0,
 		description: 'Max number of results to return',
 	},
 
@@ -393,5 +391,35 @@ export const organizationFields: INodeProperties[] = [
 		default: '',
 		description:
 			'The search to look for. Minimum 3 characters.',
+	},
+
+	//         organization:search pagination
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				operation: ['search'],
+				resource: ['organization'],
+			},
+		},
+		default: 0,
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 15,
+		},
+		displayOptions: {
+			show: {
+				operation: ['search'],
+				resource: ['organization'],
+			},
+		},
+		default: 0,
+		description: 'Max number of results to return',
 	},
 ];

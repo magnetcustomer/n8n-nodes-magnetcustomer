@@ -60,10 +60,11 @@ export async function organizationRequest(
 		case 'getAll':
 			requestMethod = 'GET';
 			endpoint = '/organizations';
-			qs = {
-				page: this.getNodeParameter('page', index),
-				limit: this.getNodeParameter('limit', index),
-			};
+			qs = {};
+			const pageGetAll = this.getNodeParameter('page', index, undefined) as number | undefined;
+			const limitGetAll = this.getNodeParameter('limit', index, undefined) as number | undefined;
+			if (typeof pageGetAll === 'number' && pageGetAll > 0) qs.page = pageGetAll;
+			if (typeof limitGetAll === 'number' && limitGetAll > 0) qs.limit = limitGetAll;
 			break;
 		case 'update':
 			requestMethod = 'PUT';
@@ -113,11 +114,12 @@ export async function organizationRequest(
 		case 'search':
 			requestMethod = 'GET';
 			endpoint = '/organizations';
-			qs = {
-				page: this.getNodeParameter('page', index),
-				limit: this.getNodeParameter('limit', index),
-				search: this.getNodeParameter('search', index) as string,
-			};
+			qs = {};
+			const pageSearch = this.getNodeParameter('page', index, undefined) as number | undefined;
+			const limitSearch = this.getNodeParameter('limit', index, undefined) as number | undefined;
+			if (typeof pageSearch === 'number' && pageSearch > 0) qs.page = pageSearch;
+			if (typeof limitSearch === 'number' && limitSearch > 0) qs.limit = limitSearch;
+			qs.search = this.getNodeParameter('search', index) as string;
 			break;
 		default:
 			break;

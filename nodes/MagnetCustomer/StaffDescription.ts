@@ -85,11 +85,11 @@ export const staffFields: INodeProperties[] = [
 		type: 'number',
 		displayOptions: {
 			show: {
-				operation: ['getAll'], // Adicionar 'search' se aplicável
+				operation: ['getAll', 'search'],
 				resource: ['staff'],
 			},
 		},
-		default: 1,
+		default: 0,
 		// required: true, // Verificar API
 	},
 	{
@@ -101,11 +101,11 @@ export const staffFields: INodeProperties[] = [
 		},
 		displayOptions: {
 			show: {
-				operation: ['getAll'], // Adicionar 'search' se aplicável
+				operation: ['getAll', 'search'],
 				resource: ['staff'],
 			},
 		},
-		default: 15, // Verificar API
+		default: 0,
 		// required: true, // Verificar API
 		description: 'Max number of results to return',
 	},
@@ -123,7 +123,7 @@ export const staffFields: INodeProperties[] = [
 			},
 		},
 		default: '',
-		required: true, // Necessário para a operação search
+		required: true,
 		description: 'The search term to look for',
 	},
 

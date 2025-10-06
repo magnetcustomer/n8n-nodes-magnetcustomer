@@ -24,11 +24,15 @@ export async function workspaceRequest(
 		case 'search': // Search usa o mesmo endpoint, mas com parâmetro 'search'
 			requestMethod = 'GET';
 			endpoint = '/treatments/workspaces'; // Endpoint CORRETO
-			qs = {
-				page: this.getNodeParameter('page', index, 1),
-				limit: this.getNodeParameter('limit', index, 15),
-				search: operation === 'search' ? this.getNodeParameter('search', index, '') : '', // Adiciona search apenas para operação search
-			};
+			qs = {};
+			const page = this.getNodeParameter('page', index, undefined) as number | undefined;
+			const limit = this.getNodeParameter('limit', index, undefined) as number | undefined;
+			if (typeof page === 'number' && page > 0) qs.page = page;
+			if (typeof limit === 'number' && limit > 0) qs.limit = limit;
+			if (operation === 'search') {
+				const search = this.getNodeParameter('search', index, '') as string;
+				if (search) qs.search = search;
+			}
 
 			// Adicionar filtros booleanos opcionais
 			const filters = this.getNodeParameter('filters', index, {}) as {

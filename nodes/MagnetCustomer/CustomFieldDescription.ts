@@ -156,11 +156,11 @@ export const customFieldFields: INodeProperties[] = [
 		},
 		displayOptions: {
 			show: {
-				operation: ['getAll'],
+				operation: ['getAll', 'search'],
 				resource: ['customField'],
 			},
 		},
-		default: 50, // API pode ter limite diferente
+		default: 15,
 		description: 'Max number of results to return',
 	},
 	{
