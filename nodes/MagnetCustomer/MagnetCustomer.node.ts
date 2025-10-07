@@ -135,6 +135,18 @@ export class MagnetCustomer implements INodeType {
 						value: 'lead',
 					},
 					{
+						name: 'Meeting',
+						value: 'meeting',
+					},
+					{
+						name: 'Meeting Room',
+						value: 'meetingRoom',
+					},
+					{
+						name: 'Meeting Type',
+						value: 'meetingType',
+					},
+					{
 						name: 'Organization',
 						value: 'organization',
 					},
@@ -155,14 +167,6 @@ export class MagnetCustomer implements INodeType {
 						value: 'task',
 					},
 					{
-						name: 'Workspace',
-						value: 'workspace',
-					},
-					{
-						name: 'Meeting',
-						value: 'meeting',
-					},
-					{
 						name: 'Ticket',
 						value: 'ticket',
 					},
@@ -171,16 +175,12 @@ export class MagnetCustomer implements INodeType {
 						value: 'treatment',
 					},
 					{
-						name: 'Meeting Type',
-						value: 'meetingType',
-					},
-					{
-						name: 'Meeting Room',
-						value: 'meetingRoom',
-					},
-					{
 						name: 'Treatment Type',
 						value: 'treatmentType',
+					},
+					{
+						name: 'Workspace',
+						value: 'workspace',
 					},
 				],
 				default: 'deal',

@@ -16,7 +16,7 @@ export async function meetingTypeRequest(
 	let requestMethod;
 	let endpoint;
 	let body: IDataObject = {};
-	let qs: IDataObject = {};
+const qs: IDataObject = {};
 
 	switch (operation) {
 		case 'get':
