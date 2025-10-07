@@ -45,6 +45,12 @@ import { ticketFields, ticketOperations } from './TicketDescription';
 import { ticketRequest } from './TicketRequest';
 import { treatmentFields, treatmentOperations } from './TreatmentDescription';
 import { treatmentRequest } from './TreatmentRequest';
+import { meetingTypeFields, meetingTypeOperations } from './MeetingTypeDescription';
+import { meetingTypeRequest } from './MeetingTypeRequest';
+import { meetingRoomFields, meetingRoomOperations } from './MeetingRoomDescription';
+import { meetingRoomRequest } from './MeetingRoomRequest';
+import { treatmentTypeFields, treatmentTypeOperations } from './TreatmentTypeDescription';
+import { treatmentTypeRequest } from './TreatmentTypeRequest';
 
 
 export class MagnetCustomer implements INodeType {
@@ -164,6 +170,18 @@ export class MagnetCustomer implements INodeType {
 						name: 'Treatment',
 						value: 'treatment',
 					},
+					{
+						name: 'Meeting Type',
+						value: 'meetingType',
+					},
+					{
+						name: 'Meeting Room',
+						value: 'meetingRoom',
+					},
+					{
+						name: 'Treatment Type',
+						value: 'treatmentType',
+					},
 				],
 				default: 'deal',
 			},
@@ -212,6 +230,15 @@ export class MagnetCustomer implements INodeType {
 
 			...treatmentOperations,
 			...treatmentFields,
+
+			...meetingTypeOperations,
+			...meetingTypeFields,
+
+			...meetingRoomOperations,
+			...meetingRoomFields,
+
+			...treatmentTypeOperations,
+			...treatmentTypeFields,
 
 			// ----------------------------------
 			//         deal / organization / contact
@@ -578,6 +605,15 @@ export class MagnetCustomer implements INodeType {
 						break;
 					case 'treatment':
 						responseData = await treatmentRequest.call(this, operation, i);
+						break;
+					case 'meetingType':
+						responseData = await meetingTypeRequest.call(this, operation, i);
+						break;
+					case 'meetingRoom':
+						responseData = await meetingRoomRequest.call(this, operation, i);
+						break;
+					case 'treatmentType':
+						responseData = await treatmentTypeRequest.call(this, operation, i);
 						break;
 					default:
 						break;

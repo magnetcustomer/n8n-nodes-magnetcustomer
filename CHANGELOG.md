@@ -15,6 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     *   Treatments: get, get many, search, create, update, delete.
 *   Pagination optionality applied to new resources (page/limit only when > 0).
 
+## [1.8.1] - 2025-10-07
+
+### Added
+
+*   Sub-resources:
+    *   Meeting Types: get, get many, search, create, update, delete.
+    *   Meeting Rooms: get, get many, search, create, update, delete.
+    *   Treatment Types: get, get many, search, create, update, delete.
+
 ## [1.7.4] - 2025-10-06
 
 ### Changed
