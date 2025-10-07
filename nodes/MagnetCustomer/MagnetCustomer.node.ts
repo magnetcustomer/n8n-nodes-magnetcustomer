@@ -39,6 +39,12 @@ import { customFieldTypeFields, customFieldTypeOperations } from './CustomFieldT
 import { customFieldTypeRequest } from './CustomFieldTypeRequest';
 import { pipelineFields, pipelineOperations } from './PipelineDescription';
 import { pipelineRequest } from './PipelineRequest';
+import { meetingFields, meetingOperations } from './MeetingDescription';
+import { meetingRequest } from './MeetingRequest';
+import { ticketFields, ticketOperations } from './TicketDescription';
+import { ticketRequest } from './TicketRequest';
+import { treatmentFields, treatmentOperations } from './TreatmentDescription';
+import { treatmentRequest } from './TreatmentRequest';
 
 
 export class MagnetCustomer implements INodeType {
@@ -146,6 +152,18 @@ export class MagnetCustomer implements INodeType {
 						name: 'Workspace',
 						value: 'workspace',
 					},
+					{
+						name: 'Meeting',
+						value: 'meeting',
+					},
+					{
+						name: 'Ticket',
+						value: 'ticket',
+					},
+					{
+						name: 'Treatment',
+						value: 'treatment',
+					},
 				],
 				default: 'deal',
 			},
@@ -185,6 +203,15 @@ export class MagnetCustomer implements INodeType {
 
 			...pipelineOperations,
 			...pipelineFields,
+
+			...meetingOperations,
+			...meetingFields,
+
+			...ticketOperations,
+			...ticketFields,
+
+			...treatmentOperations,
+			...treatmentFields,
 
 			// ----------------------------------
 			//         deal / organization / contact
@@ -542,6 +569,15 @@ export class MagnetCustomer implements INodeType {
 						break;
 					case 'pipeline':
 						responseData = await pipelineRequest.call(this, operation, i);
+						break;
+					case 'meeting':
+						responseData = await meetingRequest.call(this, operation, i);
+						break;
+					case 'ticket':
+						responseData = await ticketRequest.call(this, operation, i);
+						break;
+					case 'treatment':
+						responseData = await treatmentRequest.call(this, operation, i);
 						break;
 					default:
 						break;

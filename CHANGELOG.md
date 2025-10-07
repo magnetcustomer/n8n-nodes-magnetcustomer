@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2025-10-07
+
+### Added
+
+*   New resources for n8n node:
+    *   Meetings: get, get many, search, create, update, delete.
+    *   Tickets: get, get many, search, create, update, delete.
+    *   Treatments: get, get many, search, create, update, delete.
+*   Pagination optionality applied to new resources (page/limit only when > 0).
+
 ## [1.7.4] - 2025-10-06
 
 ### Changed
