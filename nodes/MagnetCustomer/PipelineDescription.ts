@@ -110,6 +110,19 @@ export const pipelineFields: INodeProperties[] = [
 		description: 'Max number of results to return',
 	},
 	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: ['pipeline'],
+				operation: ['getAll'],
+				returnAll: [false],
+			},
+		},
+		default: 0,
+	},
+	{
 		displayName: 'Filters',
 		name: 'filters',
 		type: 'collection',
@@ -207,6 +220,38 @@ export const pipelineFields: INodeProperties[] = [
 	// ----------------------------------
 	//         pipeline: create
 	// ----------------------------------
+
+	// ----------------------------------
+	//         pipeline: search controls
+	// ----------------------------------
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: ['pipeline'],
+				operation: ['search'],
+			},
+		},
+		default: 0,
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 1,
+		},
+		displayOptions: {
+			show: {
+				resource: ['pipeline'],
+				operation: ['search'],
+			},
+		},
+		default: 0,
+		description: 'Max number of results to return',
+	},
 	{
 		displayName: 'Title',
 		name: 'title',
