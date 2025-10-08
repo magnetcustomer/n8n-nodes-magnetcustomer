@@ -148,6 +148,18 @@ export const customFieldFields: INodeProperties[] = [
 		],
 	},
 	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				operation: ['getAll', 'search'],
+				resource: ['customField'],
+			},
+		},
+		default: 0,
+	},
+	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
@@ -160,7 +172,7 @@ export const customFieldFields: INodeProperties[] = [
 				resource: ['customField'],
 			},
 		},
-		default: 15,
+		default: 0,
 		description: 'Max number of results to return',
 	},
 	{
