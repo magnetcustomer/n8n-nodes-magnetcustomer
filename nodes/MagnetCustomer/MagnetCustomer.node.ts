@@ -390,7 +390,7 @@ export class MagnetCustomer implements INodeType {
 				for (const field of data) {
 					returnData.push({
 						name: field.name,
-						value: `customField_${field._id}`,
+						value: field._id,
 					});
 				}
 
@@ -410,7 +410,7 @@ export class MagnetCustomer implements INodeType {
 				for (const field of data) {
 					returnData.push({
 						name: field.name,
-						value: `customField_${field._id}`,
+						value: field._id,
 					});
 				}
 
@@ -431,7 +431,7 @@ export class MagnetCustomer implements INodeType {
 				for (const field of data) {
 					returnData.push({
 						name: field.name,
-						value: `customField_${field._id}`,
+						value: field._id,
 					});
 				}
 
@@ -452,7 +452,7 @@ export class MagnetCustomer implements INodeType {
 				for (const field of data) {
 					returnData.push({
 						name: field.name,
-						value: `customField_${field._id}`,
+						value: field._id,
 					});
 				}
 
@@ -473,7 +473,7 @@ export class MagnetCustomer implements INodeType {
 				for (const field of data) {
 					returnData.push({
 						name: field.name,
-						value: `customField_${field._id}`,
+						value: field._id,
 					});
 				}
 

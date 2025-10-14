@@ -84,3 +84,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 *   Corrected duplicate `value` property in `getCustomFieldTypes` load options method.
 *   Removed duplicate closing bracket in `PipelineDescription.ts`.
 *   Fixed ESLint errors related to alphabetical sorting and property order. 
+
+## [1.8.3] - 2025-10-13
+
+### Changed
+
+*   Loaders de Custom Fields (Customer, Prospect, Lead, Deal, Organization): agora retornam `value` como `ObjectId` puro (sem prefixo `customField_`).
+
+### Fixed
+
+*   Sanitização em `addCustomFields`: remoção automática do prefixo `customField_` quando presente, garantindo compatibilidade com fluxos existentes e alinhamento com o backend (`customField` deve ser `ObjectId`).

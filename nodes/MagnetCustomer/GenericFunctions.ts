@@ -266,7 +266,12 @@ export function addCustomFields(collection: { customFields?: [{ _id: string, v: 
 	if (!collection?.customFields) return customFields;
 
 	for (const customField of collection.customFields) {
-		const id = customField._id;
+		let id = customField._id;
+
+		// Garante que enviamos apenas o ObjectId puro para a API, removendo prefixos legados
+		if (typeof id === 'string' && id.startsWith('customField_')) {
+			id = id.replace(/^customField_/, '');
+		}
 
 		if (id && customField.v !== undefined) {
 		customFields.push({
