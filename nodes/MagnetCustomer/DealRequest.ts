@@ -22,6 +22,9 @@ export async function dealRequest(
 
 	switch (operation) {
 		case 'create':
+				if (!this.getNodeParameter('title', index)) {
+					throw new Error('Parameter "title" is required for create operation');
+				}
 			requestMethod = 'POST';
 			endpoint = '/import/deals';
 			body = {
@@ -50,8 +53,10 @@ export async function dealRequest(
 			// Send request
 			const response = await magnetCustomerApiRequest.call(this, 'POST', endpoint, body, qs);
 
-			// Log the raw response
-			console.log('Raw API Response:', JSON.stringify(response, null, 2));
+			// Debug optional
+			if (process.env.N8N_DEBUG_MCJ === '1') {
+				console.log('Raw API Response:', JSON.stringify(response, null, 2));
+			}
 
 			return response;
 		case 'delete':

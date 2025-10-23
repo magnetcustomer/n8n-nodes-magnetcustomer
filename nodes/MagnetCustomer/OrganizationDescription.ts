@@ -97,7 +97,7 @@ export const organizationFields: INodeProperties[] = [
 				resource: ['organization'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
@@ -112,7 +112,7 @@ export const organizationFields: INodeProperties[] = [
 				resource: ['organization'],
 			},
 		},
-		default: 0,
+		default: 15,
 		description: 'Max number of results to return',
 	},
 
@@ -134,19 +134,10 @@ export const organizationFields: INodeProperties[] = [
 
 	//         organization:fields
 	{
-		displayName: 'Source',
-		name: 'source',
-		type: 'hidden',
-		default: 'n8n',
-		required: true,
-		description: 'The source of the contact',
-	},
-	{
 		displayName: 'Fullname',
 		name: 'fullname',
 		type: 'string',
 		default: '',
-		required: true,
 		displayOptions: {
 			show: {
 				operation: ['create', 'update'],
@@ -404,7 +395,7 @@ export const organizationFields: INodeProperties[] = [
 				resource: ['organization'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
@@ -419,7 +410,7 @@ export const organizationFields: INodeProperties[] = [
 				resource: ['organization'],
 			},
 		},
-		default: 0,
+		default: 15,
 		description: 'Max number of results to return',
 	},
 ];

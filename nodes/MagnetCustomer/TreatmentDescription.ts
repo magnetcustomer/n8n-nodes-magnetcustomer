@@ -21,8 +21,8 @@ export const treatmentOperations: INodeProperties[] = [
 
 export const treatmentFields: INodeProperties[] = [
 	{ displayName: 'Treatment ID', name: 'treatmentId', type: 'string', displayOptions: { show: { operation: ['get', 'delete', 'update'], resource: ['treatment'] } }, default: '', required: true },
-	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['getAll'], resource: ['treatment'] } }, default: 0 },
-	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['getAll'], resource: ['treatment'] } }, default: 0, description: 'Max number of results to return' },
+	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['getAll'], resource: ['treatment'] } }, default: 1 },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['getAll'], resource: ['treatment'] } }, default: 15, description: 'Max number of results to return' },
 
 	// create/update fields (simplified to match Postman minimal example)
 	{ displayName: 'Type ID', name: 'type', type: 'string', displayOptions: { show: { operation: ['create', 'update'], resource: ['treatment'] } }, default: '' },
@@ -32,8 +32,8 @@ export const treatmentFields: INodeProperties[] = [
 
 	// search
 	{ displayName: 'Search', name: 'search', type: 'string', displayOptions: { show: { operation: ['search'], resource: ['treatment'] } }, default: '' },
-	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['search'], resource: ['treatment'] } }, default: 0 },
-	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['search'], resource: ['treatment'] } }, default: 0, description: 'Max number of results to return' },
+	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['search'], resource: ['treatment'] } }, default: 1 },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['search'], resource: ['treatment'] } }, default: 15, description: 'Max number of results to return' },
 ];
 
 

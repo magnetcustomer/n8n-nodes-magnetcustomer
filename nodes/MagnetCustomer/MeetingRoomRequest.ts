@@ -36,6 +36,9 @@ const qs: IDataObject = {};
 			break;
 
 		case 'create':
+			if (!this.getNodeParameter('name', index)) {
+				throw new Error('Parameter "name" is required for create operation');
+			}
 			requestMethod = 'POST';
 			endpoint = '/meetings/rooms';
 			body = {

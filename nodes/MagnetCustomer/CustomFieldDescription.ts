@@ -157,14 +157,14 @@ export const customFieldFields: INodeProperties[] = [
 				resource: ['customField'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
 		typeOptions: {
-			minValue: 1,
+			minValue: 15,
 		},
 		displayOptions: {
 			show: {
@@ -172,7 +172,7 @@ export const customFieldFields: INodeProperties[] = [
 				resource: ['customField'],
 			},
 		},
-		default: 0,
+		default: 15,
 		description: 'Max number of results to return',
 	},
 	{
@@ -217,7 +217,20 @@ export const customFieldFields: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: ['create', 'update'],
+				operation: ['create'],
+				resource: ['customField'],
+			},
+		},
+		default: '',
+		description: 'Name of the custom field',
+	},
+	{
+		displayName: 'Name',
+		name: 'name',
+		type: 'string',
+		displayOptions: {
+			show: {
+				operation: ['update'],
 				resource: ['customField'],
 			},
 		},
@@ -227,7 +240,7 @@ export const customFieldFields: INodeProperties[] = [
 	{
 		displayName: 'Feature',
 		name: 'feature',
-		type: 'options', // Required for Create
+		type: 'options',
 		required: true,
 		options: [
 			{ name: 'Contact', value: 'contact' },
@@ -238,7 +251,27 @@ export const customFieldFields: INodeProperties[] = [
 		],
 		displayOptions: {
 			show: {
-				operation: ['create', 'update'],
+				operation: ['create'],
+				resource: ['customField'],
+			},
+		},
+		default: 'contact',
+		description: 'The feature this custom field belongs to',
+	},
+	{
+		displayName: 'Feature',
+		name: 'feature',
+		type: 'options',
+		options: [
+			{ name: 'Contact', value: 'contact' },
+			{ name: 'Deal', value: 'deal' },
+			{ name: 'Organization', value: 'organization' },
+			{ name: 'Staff', value: 'staff' },
+			// Adicionar outras features
+		],
+		displayOptions: {
+			show: {
+				operation: ['update'],
 				resource: ['customField'],
 			},
 		},
@@ -249,13 +282,29 @@ export const customFieldFields: INodeProperties[] = [
 		displayName: 'Field Type Name or ID',
 		name: 'fieldType',
 		type: 'options',
+		required: true,
 		typeOptions: {
 			loadOptionsMethod: 'getCustomFieldTypes',
 		},
-		required: true,
 		displayOptions: {
 			show: {
-				operation: ['create', 'update'],
+				operation: ['create'],
+				resource: ['customField'],
+			},
+		},
+		default: '',
+		description: 'Type of the custom field (e.g., varchar, text, enum, set, date, number). Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+	},
+	{
+		displayName: 'Field Type Name or ID',
+		name: 'fieldType',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getCustomFieldTypes',
+		},
+		displayOptions: {
+			show: {
+				operation: ['update'],
 				resource: ['customField'],
 			},
 		},

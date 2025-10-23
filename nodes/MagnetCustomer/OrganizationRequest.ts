@@ -24,6 +24,9 @@ export async function organizationRequest(
 
 	switch (operation) {
 		case 'create':
+				if (!this.getNodeParameter('fullname', index)) {
+					throw new Error('Parameter "fullname" is required for create operation');
+				}
 			requestMethod = 'POST';
 			endpoint = '/import/organizations';
 			body = {
@@ -45,8 +48,10 @@ export async function organizationRequest(
 			};
 			// Send request for create
 			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
-			// Log the raw response for create
-			console.log('Raw API Response (Create Organization):', JSON.stringify(response, null, 2));
+			// Debug optional
+			if (process.env.N8N_DEBUG_MCJ === '1') {
+				console.log('Raw API Response (Create Organization):', JSON.stringify(response, null, 2));
+			}
 			return response; // Return the full response for create
 
 		case 'delete':

@@ -81,7 +81,7 @@ export const meetingFields: INodeProperties[] = [
 				resource: ['meeting'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
@@ -107,12 +107,38 @@ export const meetingFields: INodeProperties[] = [
 		type: 'string',
 		displayOptions: {
 			show: {
-				operation: ['create', 'update'],
+				operation: ['create'],
+				resource: ['meeting'],
+			},
+		},
+		default: '',
+		required: true,
+		description: 'Meeting title',
+	},
+	{
+		displayName: 'Title',
+		name: 'title',
+		type: 'string',
+		displayOptions: {
+			show: {
+				operation: ['update'],
 				resource: ['meeting'],
 			},
 		},
 		default: '',
 		description: 'Meeting title',
+	},
+	{
+		displayName: 'Start',
+		name: 'start',
+		type: 'dateTime',
+		displayOptions: {
+			show: {
+				operation: ['create'],
+				resource: ['meeting'],
+			},
+		},
+		default: 0,
 		required: true,
 	},
 	{
@@ -121,7 +147,19 @@ export const meetingFields: INodeProperties[] = [
 		type: 'dateTime',
 		displayOptions: {
 			show: {
-				operation: ['create', 'update'],
+				operation: ['update'],
+				resource: ['meeting'],
+			},
+		},
+		default: 0,
+	},
+	{
+		displayName: 'End',
+		name: 'end',
+		type: 'dateTime',
+		displayOptions: {
+			show: {
+				operation: ['create'],
 				resource: ['meeting'],
 			},
 		},
@@ -134,12 +172,11 @@ export const meetingFields: INodeProperties[] = [
 		type: 'dateTime',
 		displayOptions: {
 			show: {
-				operation: ['create', 'update'],
+				operation: ['update'],
 				resource: ['meeting'],
 			},
 		},
 		default: 0,
-		required: true,
 	},
 	{
 		displayName: 'Calendar ID',
@@ -264,7 +301,7 @@ export const meetingFields: INodeProperties[] = [
 				resource: ['meeting'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',

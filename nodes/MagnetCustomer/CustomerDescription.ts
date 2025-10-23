@@ -97,7 +97,7 @@ export const customerFields: INodeProperties[] = [
 				resource: ['customer'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
@@ -112,7 +112,7 @@ export const customerFields: INodeProperties[] = [
 				resource: ['customer'],
 			},
 		},
-		default: 0,
+		default: 15,
 		description: 'Max number of results to return',
 	},
 
@@ -134,27 +134,10 @@ export const customerFields: INodeProperties[] = [
 
 	//         customer:fields
 	{
-		displayName: 'Life Cycle',
-		name: 'lifeCycle',
-		type: 'hidden',
-		default: 'customer',
-		required: true,
-		description: 'The life cycle of the contact',
-	},
-	{
-		displayName: 'Source',
-		name: 'source',
-		type: 'hidden',
-		default: 'n8n',
-		required: true,
-		description: 'The source of the contact',
-	},
-	{
 		displayName: 'Fullname',
 		name: 'fullname',
 		type: 'string',
 		default: '',
-		required: true,
 		displayOptions: {
 			show: {
 				operation: ['create', 'update'],
@@ -485,7 +468,7 @@ export const customerFields: INodeProperties[] = [
 				resource: ['customer'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
@@ -500,7 +483,7 @@ export const customerFields: INodeProperties[] = [
 				resource: ['customer'],
 			},
 		},
-		default: 0,
+		default: 15,
 		description: 'Max number of results to return',
 	},
 

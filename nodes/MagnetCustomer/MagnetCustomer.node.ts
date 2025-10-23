@@ -11,7 +11,8 @@ import type {
 import {NodeConnectionType} from "n8n-workflow";
 import {
 	magnetCustomerApiRequest,
-	magnetCustomerApiRequestAllItems,
+	magnetCustomerGetCustomFields,
+	magnetCustomerResolveCustomFields,
 	sortOptionParameters,
 } from './GenericFunctions';
 
@@ -281,30 +282,25 @@ export class MagnetCustomer implements INodeType {
 			// Get all Organizations to display them to user so that they can
 			// select them easily
 			async getOrganizations(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const {data} = (await magnetCustomerApiRequest.call(this, 'GET', '/organizations', {})) as {
-					data: Array<{ _id: string; fullname: string }>;
-				};
-
-				return sortOptionParameters(data.map(({_id, fullname}) => ({value: _id, name: fullname})));
+				const resp = await magnetCustomerApiRequest.call(this, 'GET', '/organizations', {});
+				const list = Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []);
+				return sortOptionParameters(list.map(({_id, fullname}: any) => ({value: _id, name: fullname})));
 			},
 
 			// Get all Deals to display them to user so that they can
 			// select them easily
 			async getDeals(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const {data} = (await magnetCustomerApiRequest.call(this, 'GET', '/deals', {})) as {
-					data: Array<{ _id: string; title: string }>;
-				};
-				return sortOptionParameters(data.map(({_id, title}) => ({value: _id, name: title})));
+				const resp = await magnetCustomerApiRequest.call(this, 'GET', '/deals', {});
+				const list = Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []);
+				return sortOptionParameters(list.map(({_id, title}: any) => ({value: _id, name: title})));
 			},
 
 			// Get all Contacts to display them to user so that they can
 			// select them easily
 			async getContacts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const {data} = (await magnetCustomerApiRequest.call(this, 'GET', '/contacts', {})) as {
-					data: Array<{ _id: string; fullname: string }>;
-				};
-
-				return sortOptionParameters(data.map(({_id, fullname}) => ({value: _id, name: fullname})));
+				const resp = await magnetCustomerApiRequest.call(this, 'GET', '/contacts', {});
+				const list = Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []);
+				return sortOptionParameters(list.map(({_id, fullname}: any) => ({value: _id, name: fullname})));
 			},
 
 			// Get all Users to display them to user so that they can
@@ -363,7 +359,9 @@ export class MagnetCustomer implements INodeType {
 			async getStageIds(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
 				const pipelineId = this.getNodeParameter('pipeline', 0) as string;
-				console.log('Attempting to load stages for pipeline:', pipelineId);
+				if (process.env.N8N_DEBUG_MCJ === '1') {
+					console.log('Attempting to load stages for pipeline:', pipelineId);
+				}
 				if (!pipelineId) return sortOptionParameters(returnData);
 
 				const data = await magnetCustomerApiRequest.call(this, 'GET', `/pipelines/${pipelineId}/stages`, {});
@@ -533,17 +531,12 @@ export class MagnetCustomer implements INodeType {
 			// select them easily
 			async getRoles(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
-				// Usar magnetCustomerApiRequestAllItems para buscar todas as roles
-				const roles = await magnetCustomerApiRequestAllItems.call(this, 'GET', '/api/roles'); // <-- Usar a função e o endpoint correto
-
-				// A função AllItems já deve retornar o array de itens
-				// Assumindo que cada item tem _id e name
+				const roles = await magnetCustomerApiRequest.call(this, 'GET', '/roles', {}, {});
 				for (const role of roles) {
 					if (role?._id && role.name) {
 						returnData.push({ name: role.name, value: role._id });
 					}
 				}
-
 				return sortOptionParameters(returnData);
 			},
 		},
@@ -617,6 +610,45 @@ export class MagnetCustomer implements INodeType {
 						break;
 					default:
 						break;
+				}
+
+				// Resolve custom fields for supported resources on read operations
+				const shouldResolve = ['get', 'getAll'].includes(String(operation))
+					&& ['customer', 'deal', 'organization', 'prospect', 'lead'].includes(String(resource))
+					&& (this.getNodeParameter('resolveCustomFields', 0, false) as boolean === true);
+				if (shouldResolve && responseData) {
+					const featureMap: Record<string, string> = {
+						customer: 'contact',
+						prospect: 'contact',
+						lead: 'contact',
+						deal: 'deal',
+						organization: 'organization',
+					};
+					const feature = featureMap[String(resource)];
+					try {
+						const customFieldsArray = await magnetCustomerGetCustomFields.call(this, feature);
+						const cfMap: any = {};
+						for (const f of (Array.isArray(customFieldsArray) ? customFieldsArray : [])) {
+							if (f && f._id) cfMap[`customField_${f._id}`] = f;
+						}
+						const applyResolve = (obj: any) => {
+							if (!obj || typeof obj !== 'object') return;
+							magnetCustomerResolveCustomFields(cfMap, { json: obj } as any);
+						};
+						if (Array.isArray(responseData)) {
+							for (const el of responseData) applyResolve(el);
+						} else if (Array.isArray((responseData as any)?.docs)) {
+							for (const el of (responseData as any).docs) applyResolve(el);
+						} else if (Array.isArray((responseData as any)?.data)) {
+							for (const el of (responseData as any).data) applyResolve(el);
+						} else {
+							applyResolve(responseData);
+						}
+					} catch (err) {
+						if (process.env.N8N_DEBUG_MCJ === '1') {
+							console.warn('Failed to resolve custom fields:', (err as any)?.message || err);
+						}
+					}
 				}
 
 				const executionData = this.helpers.constructExecutionMetaData(this.helpers.returnJsonArray(responseData as IDataObject), {itemData: {item: i}},);

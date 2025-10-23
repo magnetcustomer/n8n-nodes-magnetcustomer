@@ -43,3 +43,8 @@ Tested on n8n version 1.62.0
 - A partir da versão 1.8.3, os carregadores de opções de campos customizados passam a retornar o `ObjectId` puro dos campos (sem o prefixo `customField_`).
 - Fluxos existentes que ainda utilizam valores com o prefixo `customField_` continuam funcionando: o node sanitiza o valor automaticamente antes de enviar à API.
 - Formato enviado ao backend: cada item em `customFields` é `{ customField: "<ObjectId>", v: <valor> }`.
+
+## Flags de Custom Fields no Node
+
+- `Resolve Custom Fields` (para `get`/`getAll` em `customer/deal/organization/prospect/lead`): quando ativado, os campos customizados retornados como `customField_<id>` são resolvidos para seus nomes e, quando aplicável, para os rótulos das opções.
+- `Encode Custom Fields` (para `update` nos mesmos recursos): quando ativado, o node aceita no corpo os nomes dos campos ou valores legíveis, e faz o encode para o formato esperado pela API automaticamente.

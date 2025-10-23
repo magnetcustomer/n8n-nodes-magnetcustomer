@@ -26,10 +26,11 @@ export const ticketOperations: INodeProperties[] = [
 export const ticketFields: INodeProperties[] = [
 	{ displayName: 'Ticket ID', name: 'ticketId', type: 'string', displayOptions: { show: { operation: ['get', 'delete', 'update'], resource: ['ticket'] } }, default: '', required: true },
 	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['getAll'], resource: ['ticket'] } }, default: 0 },
-	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['getAll'], resource: ['ticket'] } }, default: 0, description: 'Max number of results to return' },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['getAll'], resource: ['ticket'] } }, default: 15, description: 'Max number of results to return' },
 
 	// create/update fields
-	{ displayName: 'Subject', name: 'subject', type: 'string', displayOptions: { show: { operation: ['create', 'update'], resource: ['ticket'] } }, default: '', required: true },
+	{ displayName: 'Subject', name: 'subject', type: 'string', displayOptions: { show: { operation: ['create'], resource: ['ticket'] } }, default: '', required: true },
+	{ displayName: 'Subject', name: 'subject', type: 'string', displayOptions: { show: { operation: ['update'], resource: ['ticket'] } }, default: '' },
 	{ displayName: 'Description', name: 'description', type: 'string', displayOptions: { show: { operation: ['create', 'update'], resource: ['ticket'] } }, default: '' },
 	{ displayName: 'Priority', name: 'priority', type: 'options', options: [ { name: 'Low', value: 'low' }, { name: 'Medium', value: 'medium' }, { name: 'High', value: 'high' } ], displayOptions: { show: { operation: ['create', 'update'], resource: ['ticket'] } }, default: 'medium' },
 	{ displayName: 'Workspace Receiver ID', name: 'workspaceReceiver', type: 'string', displayOptions: { show: { operation: ['create', 'update'], resource: ['ticket'] } }, default: '' },
@@ -37,8 +38,8 @@ export const ticketFields: INodeProperties[] = [
 
 	// search
 	{ displayName: 'Search', name: 'search', type: 'string', displayOptions: { show: { operation: ['search'], resource: ['ticket'] } }, default: '' },
-	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['search'], resource: ['ticket'] } }, default: 0 },
-	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['search'], resource: ['ticket'] } }, default: 0, description: 'Max number of results to return' },
+	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['search'], resource: ['ticket'] } }, default: 1 },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['search'], resource: ['ticket'] } }, default: 15, description: 'Max number of results to return' },
 ];
 
 

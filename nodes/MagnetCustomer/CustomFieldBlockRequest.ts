@@ -31,15 +31,16 @@ export async function customFieldBlockRequest(
 			body = {
 				name: this.getNodeParameter('name', index) as string,
 				feature: this.getNodeParameter('feature', index) as string,
-				order: this.getNodeParameter('order', index) as number,
 				position: this.getNodeParameter('position', index) as number,
 				isExpanded: this.getNodeParameter('isExpanded', index, true) as boolean,
 				summaryDisplay: this.getNodeParameter('summaryDisplay', index, true) as boolean,
 			};
 			// Send request for create
 			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
-			// Log the raw response for create
-			console.log('Raw API Response (Create CustomFieldBlock):', JSON.stringify(response, null, 2));
+			// Debug optional
+			if (process.env.N8N_DEBUG_MCJ === '1') {
+				console.log('Raw API Response (Create CustomFieldBlock):', JSON.stringify(response, null, 2));
+			}
 			return response; // Return the full response for create
 
 		case 'delete':

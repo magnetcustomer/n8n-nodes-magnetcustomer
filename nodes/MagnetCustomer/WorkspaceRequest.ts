@@ -70,8 +70,10 @@ export async function workspaceRequest(
 			// qs não é necessário para POST
 			// Send request for create
 			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
-			// Log the raw response for create
-			console.log('Raw API Response (Create Workspace):', JSON.stringify(response, null, 2));
+			// Debug optional
+			if (process.env.N8N_DEBUG_MCJ === '1') {
+				console.log('Raw API Response (Create Workspace):', JSON.stringify(response, null, 2));
+			}
 			return response; // Return the full response for create
 
 		case 'update':

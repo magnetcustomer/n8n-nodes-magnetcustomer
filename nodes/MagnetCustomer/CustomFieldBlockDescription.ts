@@ -90,7 +90,7 @@ export const customFieldBlockFields: INodeProperties[] = [
 		name: 'limit',
 		type: 'number',
 		typeOptions: {
-			minValue: 1,
+			minValue: 15,
 		},
 		displayOptions: {
 			show: {

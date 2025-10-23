@@ -26,6 +26,15 @@ export async function customFieldRequest(
 
 	switch (operation) {
 		case 'create':
+				if (!this.getNodeParameter('name', index)) {
+					throw new Error('Parameter "name" is required for create operation');
+				}
+				if (!this.getNodeParameter('feature', index)) {
+					throw new Error('Parameter "feature" is required for create operation');
+				}
+				if (!this.getNodeParameter('fieldType', index)) {
+					throw new Error('Parameter "fieldType" is required for create operation');
+				}
 			requestMethod = 'POST';
 			endpoint = '/customfields';
 			body = {
@@ -40,8 +49,10 @@ export async function customFieldRequest(
 			};
 			// Send request for create
 			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
-			// Log the raw response for create
-			console.log('Raw API Response (Create CustomField):', JSON.stringify(response, null, 2));
+			// Debug optional
+			if (process.env.N8N_DEBUG_MCJ === '1') {
+				console.log('Raw API Response (Create CustomField):', JSON.stringify(response, null, 2));
+			}
 			return response; // Return the full response for create
 
 		case 'delete':

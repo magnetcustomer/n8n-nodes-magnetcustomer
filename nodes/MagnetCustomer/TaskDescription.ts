@@ -97,7 +97,7 @@ export const taskFields: INodeProperties[] = [
 				resource: ['task'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
@@ -112,7 +112,7 @@ export const taskFields: INodeProperties[] = [
 				resource: ['task'],
 			},
 		},
-		default: 0,
+		default: 15,
 		description: 'Max number of results to return',
 	},
 
@@ -134,26 +134,17 @@ export const taskFields: INodeProperties[] = [
 
 	//         task:fields
 	{
-		displayName: 'Source',
-		name: 'source',
-		type: 'hidden',
-		default: 'n8n',
-		required: true,
-		description: 'The source of the contact',
-	},
-	{
 		displayName: 'Title',
 		name: 'title',
 		type: 'string',
 		default: '',
-		required: true,
 		displayOptions: {
 			show: {
 				operation: ['create', 'update'],
 				resource: ['task'],
 			},
 		},
-		description: 'The title of the task to create',
+		description: 'The title of the task',
 	},
 	{
 		displayName: 'Description',
@@ -227,8 +218,8 @@ export const taskFields: INodeProperties[] = [
 				value: 'finished',
 			},
 		],
-		default: 'open',
-		description: 'The status of the task. If not provided it will automatically be set to "open".',
+		default: 'pending',
+		description: 'The status of the task',
 		displayOptions: {
 			show: {
 				operation: ['create', 'update'],
@@ -270,7 +261,6 @@ export const taskFields: INodeProperties[] = [
 		],
 		default: 'organization',
 		description: 'Type of entity to link to this task',
-		required: true,
 		displayOptions: {
 			show: {
 				resource: ['task'],
@@ -317,7 +307,7 @@ export const taskFields: INodeProperties[] = [
 			show: {
 				operation: ['create', 'update'],
 				resource: ['task'],
-				associateWith: ['contact'],
+				associateWith: ['deal'],
 			},
 		},
 	},
@@ -350,7 +340,7 @@ export const taskFields: INodeProperties[] = [
 				resource: ['task'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
@@ -365,7 +355,7 @@ export const taskFields: INodeProperties[] = [
 				resource: ['task'],
 			},
 		},
-		default: 0,
+		default: 15,
 		description: 'Max number of results to return',
 	},
 ];

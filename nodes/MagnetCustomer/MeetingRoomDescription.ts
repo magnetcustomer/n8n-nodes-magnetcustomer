@@ -21,16 +21,17 @@ export const meetingRoomOperations: INodeProperties[] = [
 
 export const meetingRoomFields: INodeProperties[] = [
 	{ displayName: 'Room ID', name: 'meetingRoomId', type: 'string', displayOptions: { show: { operation: ['get', 'delete', 'update'], resource: ['meetingRoom'] } }, default: '', required: true },
-	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['getAll'], resource: ['meetingRoom'] } }, default: 0 },
-	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['getAll'], resource: ['meetingRoom'] } }, default: 0, description: 'Max number of results to return' },
+	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['getAll'], resource: ['meetingRoom'] } }, default: 1 },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['getAll'], resource: ['meetingRoom'] } }, default: 15, description: 'Max number of results to return' },
 
 	// create/update fields
-	{ displayName: 'Name', name: 'name', type: 'string', displayOptions: { show: { operation: ['create', 'update'], resource: ['meetingRoom'] } }, default: '', required: true },
+	{ displayName: 'Name', name: 'name', type: 'string', displayOptions: { show: { operation: ['create'], resource: ['meetingRoom'] } }, default: '', required: true },
+	{ displayName: 'Name', name: 'name', type: 'string', displayOptions: { show: { operation: ['update'], resource: ['meetingRoom'] } }, default: '' },
 
 	// search
 	{ displayName: 'Search', name: 'search', type: 'string', displayOptions: { show: { operation: ['search'], resource: ['meetingRoom'] } }, default: '' },
-	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['search'], resource: ['meetingRoom'] } }, default: 0 },
-	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['search'], resource: ['meetingRoom'] } }, default: 0, description: 'Max number of results to return' },
+	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['search'], resource: ['meetingRoom'] } }, default: 1 },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['search'], resource: ['meetingRoom'] } }, default: 15, description: 'Max number of results to return' },
 ];
 
 

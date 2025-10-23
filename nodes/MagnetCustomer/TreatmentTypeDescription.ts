@@ -21,16 +21,17 @@ export const treatmentTypeOperations: INodeProperties[] = [
 
 export const treatmentTypeFields: INodeProperties[] = [
 	{ displayName: 'Type ID', name: 'treatmentTypeId', type: 'string', displayOptions: { show: { operation: ['get', 'delete', 'update'], resource: ['treatmentType'] } }, default: '', required: true },
-	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['getAll'], resource: ['treatmentType'] } }, default: 0 },
-	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['getAll'], resource: ['treatmentType'] } }, default: 0, description: 'Max number of results to return' },
+	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['getAll'], resource: ['treatmentType'] } }, default: 1 },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['getAll'], resource: ['treatmentType'] } }, default: 15, description: 'Max number of results to return' },
 
 	// create/update fields
-	{ displayName: 'Name', name: 'name', type: 'string', displayOptions: { show: { operation: ['create', 'update'], resource: ['treatmentType'] } }, default: '', required: true },
+	{ displayName: 'Name', name: 'name', type: 'string', displayOptions: { show: { operation: ['create'], resource: ['treatmentType'] } }, default: '', required: true },
+	{ displayName: 'Name', name: 'name', type: 'string', displayOptions: { show: { operation: ['update'], resource: ['treatmentType'] } }, default: '' },
 
 	// search
 	{ displayName: 'Search', name: 'search', type: 'string', displayOptions: { show: { operation: ['search'], resource: ['treatmentType'] } }, default: '' },
-	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['search'], resource: ['treatmentType'] } }, default: 0 },
-	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['search'], resource: ['treatmentType'] } }, default: 0, description: 'Max number of results to return' },
+	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['search'], resource: ['treatmentType'] } }, default: 1 },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['search'], resource: ['treatmentType'] } }, default: 15, description: 'Max number of results to return' },
 ];
 
 

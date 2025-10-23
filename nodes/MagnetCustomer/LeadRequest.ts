@@ -23,10 +23,12 @@ export async function leadRequest(
 
 	switch (operation) {
 		case 'create':
+				if (!this.getNodeParameter('fullname', index)) {
+					throw new Error('Parameter "fullname" is required for create operation');
+				}
 			requestMethod = 'POST';
 			endpoint = '/import/leads';
 			body = {
-				lifeCycle: this.getNodeParameter('lifeCycle', index),
 				fullname: this.getNodeParameter('fullname', index),
 				email: this.getNodeParameter('email', index),
 				phones: addPhones(this.getNodeParameter('phoneCollection', index) as object),
@@ -81,7 +83,6 @@ export async function leadRequest(
 			};
 
 			// Add fields to body only if provided by the user
-			addParam('lifeCycle');
 			addParam('fullname');
 			addParam('email');
 			addParam('gender');

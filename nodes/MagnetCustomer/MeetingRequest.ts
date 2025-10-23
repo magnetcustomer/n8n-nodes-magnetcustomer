@@ -35,7 +35,16 @@ const qs: IDataObject = {};
 			}
 			break;
 
-		case 'create':
+			case 'create':
+				if (!this.getNodeParameter('title', index)) {
+					throw new Error('Parameter "title" is required for create operation');
+				}
+				if (!this.getNodeParameter('start', index)) {
+					throw new Error('Parameter "start" is required for create operation');
+				}
+				if (!this.getNodeParameter('end', index)) {
+					throw new Error('Parameter "end" is required for create operation');
+				}
 			requestMethod = 'POST';
 			endpoint = '/meetings';
 			body = {

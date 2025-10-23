@@ -36,6 +36,15 @@ const qs: IDataObject = {};
 			break;
 
 		case 'create':
+			if (!this.getNodeParameter('type', index)) {
+				throw new Error('Parameter "type" is required for create operation');
+			}
+			if (!this.getNodeParameter('contact', index)) {
+				throw new Error('Parameter "contact" is required for create operation');
+			}
+			if (!this.getNodeParameter('subject', index)) {
+				throw new Error('Parameter "subject" is required for create operation');
+			}
 			requestMethod = 'POST';
 			endpoint = '/treatments';
 			body = {

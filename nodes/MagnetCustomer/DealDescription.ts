@@ -97,7 +97,7 @@ export const dealFields: INodeProperties[] = [
 				resource: ['deal'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
@@ -112,7 +112,7 @@ export const dealFields: INodeProperties[] = [
 				resource: ['deal'],
 			},
 		},
-		default: 0,
+		default: 15,
 		description: 'Max number of results to return',
 	},
 
@@ -134,26 +134,17 @@ export const dealFields: INodeProperties[] = [
 
 	//         deal:fields
 	{
-		displayName: 'Source',
-		name: 'source',
-		type: 'hidden',
-		default: 'n8n',
-		required: true,
-		description: 'The source of the contact',
-	},
-	{
 		displayName: 'Title',
 		name: 'title',
 		type: 'string',
 		default: '',
-		required: true,
 		displayOptions: {
 			show: {
 				operation: ['create', 'update'],
 				resource: ['deal'],
 			},
 		},
-		description: 'The title of the deal to create',
+		description: 'The title of the deal',
 	},
 	{
 		displayName: 'Description',
@@ -185,7 +176,6 @@ export const dealFields: INodeProperties[] = [
 		],
 		default: 'organization',
 		description: 'Type of entity to link to this deal',
-		required: true,
 		displayOptions: {
 			show: {
 				resource: ['deal'],
@@ -406,7 +396,7 @@ export const dealFields: INodeProperties[] = [
 				resource: ['deal'],
 			},
 		},
-		default: 0,
+		default: 1,
 	},
 	{
 		displayName: 'Limit',
@@ -421,7 +411,7 @@ export const dealFields: INodeProperties[] = [
 				resource: ['deal'],
 			},
 		},
-		default: 0,
+		default: 15,
 		description: 'Max number of results to return',
 	},
 ];

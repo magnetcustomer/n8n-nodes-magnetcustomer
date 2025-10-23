@@ -35,7 +35,10 @@ const qs: IDataObject = {};
 			}
 			break;
 
-		case 'create':
+			case 'create':
+				if (!this.getNodeParameter('subject', index)) {
+					throw new Error('Parameter "subject" is required for create operation');
+				}
 			requestMethod = 'POST';
 			endpoint = '/tickets';
 			body = {

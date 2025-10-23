@@ -89,7 +89,7 @@ export const staffFields: INodeProperties[] = [
 				resource: ['staff'],
 			},
 		},
-		default: 0,
+		default: 1,
 		// required: true, // Verificar API
 	},
 	{
@@ -97,7 +97,7 @@ export const staffFields: INodeProperties[] = [
 		name: 'limit',
 		type: 'number',
 		typeOptions: {
-			minValue: 1, // Verificar API
+			minValue: 15, // Verificar API
 		},
 		displayOptions: {
 			show: {
@@ -105,7 +105,7 @@ export const staffFields: INodeProperties[] = [
 				resource: ['staff'],
 			},
 		},
-		default: 0,
+		default: 15,
 		// required: true, // Verificar API
 		description: 'Max number of results to return',
 	},
