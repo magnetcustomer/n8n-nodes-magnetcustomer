@@ -47,7 +47,7 @@ export async function customerRequest(
 				neighborhood: this.getNodeParameter('neighborhood', index),
 				cep: this.getNodeParameter('cep', index),
 				owners: [this.getNodeParameter('owners', index)],
-				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object)
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
 			};
 			break;
 		case 'delete':

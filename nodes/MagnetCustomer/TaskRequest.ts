@@ -30,7 +30,7 @@ export async function taskRequest(
 				title: this.getNodeParameter('title', index),
 				observation: this.getNodeParameter('observation', index),
 				type: this.getNodeParameter('type', index),
-				dateOfExpires: this.getNodeParameter('dateOfExpires', index)
+				dateOfExpires: this.getNodeParameter('dateOfExpires', index),
 			};
 
 			if (this.getNodeParameter('associateWith', index) === 'deal') {

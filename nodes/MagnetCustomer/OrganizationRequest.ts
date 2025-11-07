@@ -43,7 +43,7 @@ export async function organizationRequest(
 				neighborhood: this.getNodeParameter('neighborhood', index),
 				cep: this.getNodeParameter('cep', index),
 				owners: [this.getNodeParameter('owners', index)],
-				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object)
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
 			};
 			// Send request for create
 			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);

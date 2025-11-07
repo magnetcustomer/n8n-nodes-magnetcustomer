@@ -33,7 +33,7 @@ export async function dealRequest(
 				amount: this.getNodeParameter('amount', index),
 				expectedCloseDate: this.getNodeParameter('expectedCloseDate', index),
 				pipeline: this.getNodeParameter('pipeline', index),
-				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object)
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
 			};
 
 			if (this.getNodeParameter('associateWith', index) === 'contact') {
