@@ -43,8 +43,7 @@ export async function organizationRequest(
 				neighborhood: this.getNodeParameter('neighborhood', index),
 				cep: this.getNodeParameter('cep', index),
 				owners: [this.getNodeParameter('owners', index)],
-				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
-				source: this.getNodeParameter('source', index),
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object)
 			};
 			// Send request for create
 			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
@@ -97,7 +96,6 @@ export async function organizationRequest(
 			addParam('complement');
 			addParam('neighborhood');
 			addParam('cep');
-			addParam('source');
 
 			// Handle collections/arrays
 			const phones = this.getNodeParameter('phoneCollection', index) as any;

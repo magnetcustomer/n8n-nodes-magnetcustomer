@@ -47,8 +47,7 @@ export async function customerRequest(
 				neighborhood: this.getNodeParameter('neighborhood', index),
 				cep: this.getNodeParameter('cep', index),
 				owners: [this.getNodeParameter('owners', index)],
-				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
-				source: this.getNodeParameter('source', index),
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object)
 			};
 			break;
 		case 'delete':
@@ -98,7 +97,6 @@ export async function customerRequest(
 			addParam('complement');
 			addParam('neighborhood');
 			addParam('cep');
-			addParam('source');
 
 			// Handle collections/arrays - only add if non-empty
 			const phones = this.getNodeParameter('phoneCollection', index) as any;

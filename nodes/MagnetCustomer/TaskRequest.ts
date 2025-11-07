@@ -30,8 +30,7 @@ export async function taskRequest(
 				title: this.getNodeParameter('title', index),
 				observation: this.getNodeParameter('observation', index),
 				type: this.getNodeParameter('type', index),
-				dateOfExpires: this.getNodeParameter('dateOfExpires', index),
-				source: this.getNodeParameter('source', index),
+				dateOfExpires: this.getNodeParameter('dateOfExpires', index)
 			};
 
 			if (this.getNodeParameter('associateWith', index) === 'deal') {
@@ -103,7 +102,6 @@ export async function taskRequest(
 			addParam('owner');
 			addParam('status');
 			addParam('dateFinished');
-			addParam('source'); // Assuming source might be updatable
 
 			// Handle association
 			const associateWith = this.getNodeParameter('associateWith', index);

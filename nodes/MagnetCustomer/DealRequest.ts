@@ -33,8 +33,7 @@ export async function dealRequest(
 				amount: this.getNodeParameter('amount', index),
 				expectedCloseDate: this.getNodeParameter('expectedCloseDate', index),
 				pipeline: this.getNodeParameter('pipeline', index),
-				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
-				source: this.getNodeParameter('source', index),
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object)
 			};
 
 			if (this.getNodeParameter('associateWith', index) === 'contact') {
@@ -99,7 +98,6 @@ export async function dealRequest(
 			addParam('stage');
 			addParam('status');
 			addParam('staff');
-			addParam('source'); // Assuming source might be updatable
 
 			// Handle association
 			const associateWith = this.getNodeParameter('associateWith', index);

@@ -46,8 +46,7 @@ export async function leadRequest(
 				neighborhood: this.getNodeParameter('neighborhood', index),
 				cep: this.getNodeParameter('cep', index),
 				owners: [this.getNodeParameter('owners', index)],
-				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
-				source: this.getNodeParameter('source', index),
+				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object)
 			};
 
 			break;
@@ -98,7 +97,6 @@ export async function leadRequest(
 			addParam('complement');
 			addParam('neighborhood');
 			addParam('cep');
-			addParam('source');
 
 			// Handle collections/arrays
 			const phones = this.getNodeParameter('phoneCollection', index) as any;
