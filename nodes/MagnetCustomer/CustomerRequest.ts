@@ -28,7 +28,7 @@ export async function customerRequest(
 					throw new Error('Parameter "fullname" is required for create operation');
 				}
 			requestMethod = 'POST';
-			endpoint = '/import/contacts';
+			endpoint = '/customers';
 			body = {
 				fullname: this.getNodeParameter('fullname', index),
 				email: this.getNodeParameter('email', index),
