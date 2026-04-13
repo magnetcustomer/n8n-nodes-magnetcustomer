@@ -3,10 +3,12 @@
 
   <br/><br/>
 
-  ![License](https://img.shields.io/npm/l/n8n-nodes-magnetcustomer)
-  ![npm version](https://img.shields.io/npm/v/@magnetcustomer/n8n-nodes-magnetcustomer)
-  ![Downloads](https://img.shields.io/npm/dt/n8n-nodes-magnetcustomer)
+  ![License](https://img.shields.io/github/license/magnetcustomer/n8n-nodes-magnetcustomer)
+  ![npm version](https://img.shields.io/npm/v/%40magnetcustomer%2Fn8n-nodes-magnetcustomer)
+  ![Downloads](https://img.shields.io/npm/dt/%40magnetcustomer%2Fn8n-nodes-magnetcustomer)
   [![n8n](https://img.shields.io/badge/n8n-community-F94B72)](https://community.n8n.io/)
+
+  **[English](docs/en/MIGRATION_V1_TO_V2.md)** | **[Portugues](docs/pt-br/MIGRATION_V1_TO_V2.md)** | **[Espanol](docs/es/MIGRATION_V1_TO_V2.md)**
 </div>
 
 # n8n-nodes-magnetcustomer
