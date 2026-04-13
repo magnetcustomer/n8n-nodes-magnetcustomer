@@ -26,7 +26,7 @@ export async function dealRequest(
 					throw new Error('Parameter "title" is required for create operation');
 				}
 			requestMethod = 'POST';
-			endpoint = '/import/deals';
+			endpoint = '/deals';
 			body = {
 				title: this.getNodeParameter('title', index),
 				description: this.getNodeParameter('description', index),
@@ -34,6 +34,7 @@ export async function dealRequest(
 				expectedCloseDate: this.getNodeParameter('expectedCloseDate', index),
 				pipeline: this.getNodeParameter('pipeline', index),
 				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
+				source: 'n8n',
 			};
 
 			if (this.getNodeParameter('associateWith', index) === 'contact') {

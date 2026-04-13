@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] — 2026-04-13
+
+### BREAKING CHANGES
+
+- **Endpoints migrated to V2 API:** All create operations now use direct endpoints (`/leads`, `/contacts`, `/deals`, etc.) instead of import endpoints (`/import/leads`, `/import/contacts`, etc.). Requires MagnetCustomer platform V2.
+- **Source tracking:** Integration source moved from HTTP header (`api: 'n8n'`) to request body (`source: 'n8n'`). Contacts created via n8n are now properly tracked with `source: 'n8n'` in the CRM.
+- **V1 no longer supported:** This version requires MagnetCustomer platform V2. Customers on V1 should use version 1.9.x.
+
+### Changed
+
+- API reference URL updated to `https://apireference.magnetcustomer.com`
+
+### Removed
+
+- Postman V1 collection (947KB) — use [API Reference](https://apireference.magnetcustomer.com) instead
+
+### Documentation
+
+- Enterprise README with resources table, examples, migration guide, troubleshooting
+- Added CONTRIBUTING.md, SECURITY.md
+- Updated LICENSE copyright to Magnet Customer
+- Updated CODE_OF_CONDUCT to Contributor Covenant v2.1
+- Added GitHub issue/PR templates
+
 ## [1.8.2] - 2025-10-07
 
 ### Changed

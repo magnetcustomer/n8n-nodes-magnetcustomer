@@ -2,12 +2,15 @@
 
 ## Our Pledge
 
-In the interest of fostering an open and welcoming environment, we as
-contributors and maintainers pledge to making participation in our project and
-our community a harassment-free experience for everyone, regardless of age, body
-size, disability, ethnicity, sex characteristics, gender identity and expression,
-level of experience, education, socio-economic status, nationality, personal
-appearance, race, religion, or sexual identity and orientation.
+We as members, contributors, and leaders pledge to make participation in our
+community a harassment-free experience for everyone.
+
+We pledge to act and interact in ways that contribute to an open, welcoming,
+diverse, inclusive, and healthy community.
+
+This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.1.
+
+**Enforcement:** suporte@magnetcustomer.com
 
 ## Our Standards
 

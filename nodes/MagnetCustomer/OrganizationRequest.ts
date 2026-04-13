@@ -28,7 +28,7 @@ export async function organizationRequest(
 					throw new Error('Parameter "fullname" is required for create operation');
 				}
 			requestMethod = 'POST';
-			endpoint = '/import/organizations';
+			endpoint = '/organizations';
 			body = {
 				fullname: this.getNodeParameter('fullname', index),
 				email: this.getNodeParameter('email', index),
@@ -44,6 +44,7 @@ export async function organizationRequest(
 				cep: this.getNodeParameter('cep', index),
 				owners: [this.getNodeParameter('owners', index)],
 				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
+				source: 'n8n',
 			};
 			// Send request for create
 			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);

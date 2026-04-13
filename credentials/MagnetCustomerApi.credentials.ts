@@ -5,7 +5,7 @@ export class MagnetCustomerApi implements ICredentialType {
 
 	displayName = 'MagnetCustomer API';
 
-	documentationUrl = 'https://developers.magnetcustomer.com';
+	documentationUrl = 'https://apireference.magnetcustomer.com';
 
 	properties: INodeProperties[] = [
 		{

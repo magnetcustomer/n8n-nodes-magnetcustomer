@@ -25,12 +25,13 @@ export async function taskRequest(
 					throw new Error('Parameter "title" is required for create operation');
 				}
 			requestMethod = 'POST';
-			endpoint = '/import/tasks';
+			endpoint = '/tasks';
 			body = {
 				title: this.getNodeParameter('title', index),
 				observation: this.getNodeParameter('observation', index),
 				type: this.getNodeParameter('type', index),
 				dateOfExpires: this.getNodeParameter('dateOfExpires', index),
+				source: 'n8n',
 			};
 
 			if (this.getNodeParameter('associateWith', index) === 'deal') {

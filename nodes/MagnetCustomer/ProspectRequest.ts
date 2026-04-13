@@ -27,7 +27,7 @@ export async function prospectRequest(
 					throw new Error('Parameter "fullname" is required for create operation');
 				}
 			requestMethod = 'POST';
-			endpoint = '/import/prospects';
+			endpoint = '/prospects';
 			body = {
 				fullname: this.getNodeParameter('fullname', index),
 				email: this.getNodeParameter('email', index),
@@ -47,6 +47,7 @@ export async function prospectRequest(
 				cep: this.getNodeParameter('cep', index),
 				owners: [this.getNodeParameter('owners', index)],
 				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
+				source: 'n8n',
 			};
 			break;
 		case 'delete':
