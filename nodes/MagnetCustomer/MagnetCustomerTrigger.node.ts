@@ -11,7 +11,7 @@ import {
 	IHookFunctions,
 	IWebhookFunctions,
 	IWebhookResponseData,
-	NodeConnectionType
+	NodeConnectionTypes
 } from "n8n-workflow";
 import basicAuth from "basic-auth";
 import {
@@ -48,7 +48,7 @@ export class MagnetCustomerTrigger implements INodeType {
 			name: 'MagnetCustomer',
 		},
 		inputs: [],
-		outputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'magnetCustomerApi',

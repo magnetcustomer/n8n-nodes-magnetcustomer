@@ -8,7 +8,7 @@ import type {
 	INodeTypeDescription,
 } from 'n8n-workflow';
 
-import {NodeConnectionType} from "n8n-workflow";
+import {NodeConnectionTypes} from "n8n-workflow";
 import {
 	magnetCustomerApiRequest,
 	magnetCustomerGetCustomFields,
@@ -66,8 +66,8 @@ export class MagnetCustomer implements INodeType {
 		defaults: {
 			name: 'MagnetCustomer',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'magnetCustomerApi',
