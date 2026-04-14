@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] — 2026-04-14
+
+### Fixed
+
+- **Response returning `[]` on create/update:** Prospect, Customer and Lead operations were destructuring the API response as `{contact}`, but the API returns the object directly. This caused all POST/PUT operations on these resources to return empty arrays instead of the created/updated record.
+
+### Added
+
+- **Test suite:** Jest + ts-jest infrastructure with 50 tests covering the full n8n execute() flow. Tests mock only the HTTP layer and use real n8n helpers (returnJsonArray, constructExecutionMetaData) to catch bugs exactly as users would experience them.
+
 ## [2.0.0] — 2026-04-13
 
 ### BREAKING CHANGES

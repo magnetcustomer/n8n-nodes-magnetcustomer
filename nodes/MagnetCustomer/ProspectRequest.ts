@@ -135,15 +135,8 @@ export async function prospectRequest(
 		return { success: true };
 	}
 
-	// Ajuste para Update retornar o objeto contact
-	if (operation === 'update') {
-		const { contact } = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-		return contact;
-	}
-
 	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 
-	const {contact} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-	return contact;
+	return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 }
 

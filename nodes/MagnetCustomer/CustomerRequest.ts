@@ -138,13 +138,6 @@ export async function customerRequest(
 
 	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 
-	// Ajuste para Update retornar o objeto contact
-	if (operation === 'update') {
-		const { contact } = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-		return contact;
-	}
-
-	const {contact} = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
-	return contact;
+	return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 }
 
