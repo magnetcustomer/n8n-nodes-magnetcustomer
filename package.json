@@ -30,6 +30,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "e2e:infra:start": "cd e2e && bash setup.sh",
+    "e2e:infra:stop": "cd e2e && bash teardown.sh",
+    "test:e2e": "jest --config jest.e2e.config.js --runInBand",
     "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
   },
   "files": [

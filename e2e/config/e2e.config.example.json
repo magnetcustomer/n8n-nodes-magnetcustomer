@@ -1,0 +1,17 @@
+{
+  "magnetCustomer": {
+    "apiUrl": "http://localhost:3001",
+    "subDomainAccount": "mc",
+    "clientId": "",
+    "clientSecret": ""
+  },
+  "n8n": {
+    "url": "http://localhost:5678",
+    "apiKey": ""
+  },
+  "options": {
+    "triggerMode": "simulated",
+    "cleanupPrefix": "n8n-e2e-",
+    "timeoutMs": 30000
+  }
+}

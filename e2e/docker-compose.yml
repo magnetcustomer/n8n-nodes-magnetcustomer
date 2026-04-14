@@ -1,0 +1,20 @@
+services:
+  n8n:
+    build: .
+    container_name: n8n-e2e
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_SECURE_COOKIE=false
+      - N8N_RUNNERS_ENABLED=false
+      - N8N_ENCRYPTION_KEY=n8n-e2e-test-encryption-key
+      - DB_TYPE=sqlite
+    volumes:
+      - ../dist:/home/node/.n8n/custom/node_modules/@magnetcustomer/n8n-nodes-magnetcustomer/dist:ro
+      - ../package.json:/home/node/.n8n/custom/node_modules/@magnetcustomer/n8n-nodes-magnetcustomer/package.json:ro
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:

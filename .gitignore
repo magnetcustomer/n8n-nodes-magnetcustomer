@@ -8,3 +8,5 @@ yarn.lock
 .vscode/launch.json
 .idea
 coverage
+e2e/config/e2e.config.json
+e2e/config/.e2e-context.json
