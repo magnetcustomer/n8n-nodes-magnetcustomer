@@ -387,3 +387,275 @@ describe('HTTP request construction', () => {
 		expect(req!.body!.phones).toEqual([{ typePhone: 'business', number: '+5511999990000' }]);
 	});
 });
+
+// ============================================================
+// CUSTOM FIELDS HANDLING
+// ============================================================
+describe('Custom Fields handling', () => {
+	it('Prospect create sends customFields correctly to API', async () => {
+		const apiResponse = { _id: 'p1', fullname: 'Jane' };
+		const ctx = createExecuteContext(
+			contactCreateParams({
+				resource: 'prospect', operation: 'create',
+				customFieldCollection: {
+					customFields: [
+						{ _id: 'abc123', v: 'valor1' },
+						{ _id: 'def456', v: 'valor2' },
+					],
+				},
+			}),
+			apiResponse,
+		);
+
+		await node.execute.call(ctx as any);
+
+		const req = getHttpRequestOptions(ctx);
+		expect(req!.body!.customFields).toEqual([
+			{ customField: 'abc123', v: 'valor1' },
+			{ customField: 'def456', v: 'valor2' },
+		]);
+	});
+
+	it('Deal create sends customFields correctly', async () => {
+		const apiResponse = { _id: 'd1', title: 'CF Deal' };
+		const ctx = createExecuteContext(
+			dealCreateParams({
+				customFieldCollection: {
+					customFields: [
+						{ _id: 'cf-x', v: '100' },
+					],
+				},
+			}),
+			apiResponse,
+		);
+
+		await node.execute.call(ctx as any);
+
+		const req = getHttpRequestOptions(ctx);
+		expect(req!.body!.customFields).toEqual([
+			{ customField: 'cf-x', v: '100' },
+		]);
+	});
+
+	it('Custom field with legacy prefix gets stripped', async () => {
+		const apiResponse = { _id: 'p1', fullname: 'Legacy' };
+		const ctx = createExecuteContext(
+			contactCreateParams({
+				resource: 'prospect', operation: 'create',
+				customFieldCollection: {
+					customFields: [
+						{ _id: 'customField_abc123', v: 'stripped' },
+					],
+				},
+			}),
+			apiResponse,
+		);
+
+		await node.execute.call(ctx as any);
+
+		const req = getHttpRequestOptions(ctx);
+		// The customField_ prefix should be stripped, sending only the ObjectId
+		expect(req!.body!.customFields).toEqual([
+			{ customField: 'abc123', v: 'stripped' },
+		]);
+	});
+});
+
+// ============================================================
+// PAGINATION HANDLING
+// ============================================================
+describe('Pagination handling', () => {
+	it('getAll sends page and limit in query string', async () => {
+		const apiResponse = { docs: [{ _id: 'p1' }], totalDocs: 1 };
+		const ctx = createExecuteContext(
+			{ authentication: 'apiToken', resource: 'prospect', operation: 'getAll', page: 2, limit: 10, resolveCustomFields: false },
+			apiResponse,
+		);
+
+		await node.execute.call(ctx as any);
+
+		const req = getHttpRequestOptions(ctx);
+		expect(req!.qs).toEqual({ page: 2, limit: 10 });
+	});
+
+	it('getAll without page/limit sends empty qs', async () => {
+		const apiResponse = { docs: [{ _id: 'p1' }], totalDocs: 1 };
+		const ctx = createExecuteContext(
+			{ authentication: 'apiToken', resource: 'prospect', operation: 'getAll', resolveCustomFields: false },
+			apiResponse,
+		);
+
+		await node.execute.call(ctx as any);
+
+		const req = getHttpRequestOptions(ctx);
+		expect(req!.qs).toEqual({});
+	});
+
+	it('search sends search term plus pagination', async () => {
+		const apiResponse = { docs: [{ _id: 'p1', fullname: 'John' }] };
+		const ctx = createExecuteContext(
+			{ authentication: 'apiToken', resource: 'prospect', operation: 'search', search: 'John', page: 1, limit: 25, resolveCustomFields: false },
+			apiResponse,
+		);
+
+		await node.execute.call(ctx as any);
+
+		const req = getHttpRequestOptions(ctx);
+		expect(req!.qs!.search).toBe('John');
+		expect(req!.qs!.page).toBe(1);
+		expect(req!.qs!.limit).toBe(25);
+	});
+});
+
+// ============================================================
+// ERROR SCENARIOS (extended)
+// ============================================================
+describe('Error scenarios', () => {
+	it('returns error when API returns HTTP error', async () => {
+		const ctx = createExecuteContext(
+			contactCreateParams({ resource: 'prospect', operation: 'create' }),
+			{},
+			{ continueOnFail: true },
+		);
+		// Override the mock to reject
+		ctx._mockHttp.mockRejectedValue(new Error('Request failed with status code 500'));
+
+		const result = await node.execute.call(ctx as any);
+		const output = getOutputItems(result);
+
+		expect(output[0]).toHaveProperty('error');
+		expect(output[0].error).toContain('500');
+	});
+
+	it('throws when required field is missing (prospect fullname)', async () => {
+		const ctx = createExecuteContext(
+			contactCreateParams({ resource: 'prospect', operation: 'create', fullname: '' }),
+			{},
+			{ continueOnFail: false },
+		);
+
+		await expect(node.execute.call(ctx as any)).rejects.toThrow('fullname');
+	});
+
+	it('throws when required field is missing (deal title)', async () => {
+		const ctx = createExecuteContext(
+			dealCreateParams({ title: '' }),
+			{},
+			{ continueOnFail: false },
+		);
+
+		await expect(node.execute.call(ctx as any)).rejects.toThrow('title');
+	});
+
+	it('throws when required field is missing (treatment type/contact/subject)', async () => {
+		const baseParams = {
+			authentication: 'apiToken', resource: 'treatment', operation: 'create',
+			type: '', contact: '', subject: '', nameType: '',
+		};
+
+		// Missing type
+		const ctx1 = createExecuteContext(baseParams, {}, { continueOnFail: false });
+		await expect(node.execute.call(ctx1 as any)).rejects.toThrow('type');
+
+		// Missing contact (type present)
+		const ctx2 = createExecuteContext(
+			{ ...baseParams, type: 'type-1' },
+			{},
+			{ continueOnFail: false },
+		);
+		await expect(node.execute.call(ctx2 as any)).rejects.toThrow('contact');
+
+		// Missing subject (type and contact present)
+		const ctx3 = createExecuteContext(
+			{ ...baseParams, type: 'type-1', contact: 'c1' },
+			{},
+			{ continueOnFail: false },
+		);
+		await expect(node.execute.call(ctx3 as any)).rejects.toThrow('subject');
+	});
+});
+
+// ============================================================
+// DELETE RESPONSE PATTERNS
+// ============================================================
+describe('Delete response patterns', () => {
+	it('Prospect delete returns { success: true }', async () => {
+		const ctx = createExecuteContext(
+			{ authentication: 'apiToken', resource: 'prospect', operation: 'delete', prospectId: 'p1' },
+			{},
+		);
+
+		const result = await node.execute.call(ctx as any);
+		const output = getOutputItems(result);
+
+		expect(output[0].success).toBe(true);
+	});
+
+	it('Deal delete returns API response directly', async () => {
+		const apiResponse = { _id: 'd1', deleted: true };
+		const ctx = createExecuteContext(
+			{ authentication: 'apiToken', resource: 'deal', operation: 'delete', dealId: 'd1' },
+			apiResponse,
+		);
+
+		const result = await node.execute.call(ctx as any);
+		const output = getOutputItems(result);
+
+		// Deal delete does NOT wrap in { success: true }, it returns the raw API response
+		expect(output[0]._id).toBe('d1');
+		expect(output[0].deleted).toBe(true);
+	});
+});
+
+// ============================================================
+// ASSOCIATION HANDLING
+// ============================================================
+describe('Association handling', () => {
+	it('Deal create with contact association', async () => {
+		const apiResponse = { _id: 'd1', title: 'Assoc Deal', contact: 'c1' };
+		const ctx = createExecuteContext(
+			dealCreateParams({ associateWith: 'contact', contact: 'c1', organization: '' }),
+			apiResponse,
+		);
+
+		await node.execute.call(ctx as any);
+
+		const req = getHttpRequestOptions(ctx);
+		expect(req!.body!.contact).toBe('c1');
+		expect(req!.body!.organization).toBeUndefined();
+	});
+
+	it('Deal create with organization association', async () => {
+		const apiResponse = { _id: 'd1', title: 'Org Deal', organization: 'o1' };
+		const ctx = createExecuteContext(
+			dealCreateParams({ associateWith: 'organization', contact: '', organization: 'o1' }),
+			apiResponse,
+		);
+
+		await node.execute.call(ctx as any);
+
+		const req = getHttpRequestOptions(ctx);
+		expect(req!.body!.organization).toBe('o1');
+		expect(req!.body!.contact).toBeUndefined();
+	});
+
+	it('Task create with deal association', async () => {
+		const apiResponse = { _id: 't1', title: 'Task Deal', deal: 'd1' };
+		const ctx = createExecuteContext(
+			{
+				authentication: 'apiToken', resource: 'task', operation: 'create',
+				title: 'Task Deal', observation: '', type: 'type-1',
+				dateOfExpires: '2026-12-31', associateWith: 'deal', deal: 'd1',
+				contact: '', organization: '', owner: 'staff-1', dateFinished: '', status: 'open',
+			},
+			apiResponse,
+		);
+
+		await node.execute.call(ctx as any);
+
+		const req = getHttpRequestOptions(ctx);
+		expect(req!.body!.deal).toBe('d1');
+		expect(req!.body!.contact).toBeUndefined();
+		expect(req!.body!.organization).toBeUndefined();
+	});
+});
