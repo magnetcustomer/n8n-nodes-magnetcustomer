@@ -79,20 +79,47 @@ export default async function globalSetup() {
     console.warn('  CustomFieldType: not available');
   }
 
-  // n8n credential ID
+  // n8n credential ID — try public API first, fallback to internal REST
   try {
-    const res = await fetch(`${config.n8n.url}/api/v1/credentials`, {
+    let list: any[] = [];
+
+    // Try public API
+    const pubRes = await fetch(`${config.n8n.url}/api/v1/credentials`, {
       headers: { 'X-N8N-API-KEY': config.n8n.apiKey },
     });
-    const creds = await res.json();
-    const list = creds.data || creds || [];
+    if (pubRes.ok) {
+      const pubData = await pubRes.json();
+      list = pubData.data || pubData || [];
+    }
+
+    // Fallback: login + internal REST (public API may lack credential:read scope)
+    if (list.length === 0) {
+      const loginRes = await fetch(`${config.n8n.url}/rest/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailOrLdapLoginId: 'e2e@magnetcustomer.com', password: '<E2E_PASSWORD>' }),
+      });
+      const cookie = loginRes.headers.get('set-cookie')?.split(';')[0] || '';
+      if (cookie) {
+        const intRes = await fetch(`${config.n8n.url}/rest/credentials`, {
+          headers: { 'Cookie': cookie },
+        });
+        if (intRes.ok) {
+          const intData = await intRes.json();
+          list = intData.data || intData || [];
+        }
+      }
+    }
+
     const mcCred = list.find((c: any) => c.type === 'magnetCustomerApi');
     if (mcCred) {
       context.credentialId = mcCred.id;
       console.log(`  n8n Credential: ${mcCred.name} (${mcCred.id})`);
+    } else {
+      console.warn('  n8n Credential: not found (create via setup.sh or n8n UI)');
     }
   } catch (e) {
-    console.warn('  n8n Credential: not found');
+    console.warn('  n8n Credential: error fetching');
   }
 
   // 5. Save context
