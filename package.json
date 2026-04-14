@@ -70,7 +70,7 @@
     "eslint-plugin-unicorn": "^51.0.1",
     "eslint-plugin-unused-imports": "^3.1.0",
     "eslint-plugin-vue": "^9.23.0",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.1",
     "jest": "^30.3.0",
     "n8n-core": "^1.62.0",
     "n8n-workflow": "^1.62.0",
