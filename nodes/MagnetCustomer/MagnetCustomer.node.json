@@ -6,12 +6,12 @@
 	"resources": {
 		"credentialDocumentation": [
 			{
-				"url": "https://developers.magnetcustomer.com"
+				"url": "https://apireference.magnetcustomer.com"
 			}
 		],
 		"primaryDocumentation": [
 			{
-				"url": "https://developers.magnetcustomer.com"
+				"url": "https://apireference.magnetcustomer.com"
 			}
 		]
 	}
