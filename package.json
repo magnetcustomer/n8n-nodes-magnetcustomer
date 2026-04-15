@@ -1,6 +1,6 @@
 {
   "name": "@magnetcustomer/n8n-nodes-magnetcustomer",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "n8n community node for Magnet Customer CRM — automate leads, deals, contacts, tasks and more",
   "keywords": [
     "n8n",

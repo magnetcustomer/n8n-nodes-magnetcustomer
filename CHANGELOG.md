@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] — 2026-04-15
+
+### Fixed
+
+- **Empty reference fields causing API errors:** Fields like `contact`, `staff`, `deal`, `organization` were being sent as `""` (empty string) when left blank, causing Cast to ObjectId errors. Now these fields are omitted from the request body when empty.
+- **Customer create missing `lifeCycle`:** The `/contacts` endpoint requires explicit `lifeCycle: 'customer'` which was not being sent.
+- **Task create rejected by API:** The `source: 'n8n'` field was not a valid enum value in the Task schema. Removed from task create body.
+- **CustomFieldBlock getAll/search error:** The `feature` parameter was being read directly from node params instead of the `filters` collection, causing "parameter not found" errors.
+- **MAGNETCUSTOMER_API_BASE_URL:** Added environment variable override for the API base URL, enabling Docker/E2E environments where the API is not at the standard URL.
+
+### Added
+
+- **E2E testing infrastructure:** Docker-based E2E tests that provision n8n, create workflows via API, execute against the real MagnetCustomer API, and validate output. 19 test suites, 105 tests.
+- **Dynamic field discovery:** E2E tests discover required fields per tenant dynamically, generating test values by field type. Works with any tenant configuration.
+
 ## [2.1.1] — 2026-04-14
 
 ### Fixed
