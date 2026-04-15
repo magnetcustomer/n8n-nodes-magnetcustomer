@@ -9,6 +9,11 @@ export interface E2EConfig {
     clientId: string;
     clientSecret: string;
   };
+  keycloak: {
+    tokenUrl: string;
+    username?: string;
+    password?: string;
+  };
   n8n: {
     url: string;
     apiKey: string;
@@ -41,8 +46,8 @@ export function loadConfig(): E2EConfig {
     [raw.magnetCustomer?.subDomainAccount, 'magnetCustomer.subDomainAccount'],
     [raw.magnetCustomer?.clientId, 'magnetCustomer.clientId'],
     [raw.magnetCustomer?.clientSecret, 'magnetCustomer.clientSecret'],
+    [raw.keycloak?.tokenUrl, 'keycloak.tokenUrl'],
     [raw.n8n?.url, 'n8n.url'],
-    [raw.n8n?.apiKey, 'n8n.apiKey'],
   ];
 
   for (const [value, name] of required) {
@@ -58,4 +63,32 @@ export function loadConfig(): E2EConfig {
 export function getConfig(): E2EConfig {
   if (!cachedConfig) throw new Error('Config not loaded. Call loadConfig() first.');
   return cachedConfig;
+}
+
+/**
+ * Get a fresh API token via Keycloak password grant.
+ * Uses the e2e-backend client with e2e-admin user credentials.
+ * Password grant provides a user context (staff) needed by the API.
+ * Token is valid for 1 hour — sufficient for a full test run.
+ */
+export async function getApiToken(): Promise<string> {
+  const config = getConfig();
+  const res = await fetch(config.keycloak.tokenUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: config.magnetCustomer.clientId,
+      client_secret: config.magnetCustomer.clientSecret,
+      grant_type: 'password',
+      username: config.keycloak.username || 'e2e-admin',
+      password: config.keycloak.password || '<KC_PASSWORD>',
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Keycloak token request failed: ${res.status} ${await res.text()}`);
+  }
+
+  const data = await res.json();
+  return data.access_token;
 }

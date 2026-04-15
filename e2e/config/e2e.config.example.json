@@ -2,8 +2,11 @@
   "magnetCustomer": {
     "apiUrl": "http://localhost:3001",
     "subDomainAccount": "mc",
-    "clientId": "",
-    "clientSecret": ""
+    "clientId": "e2e-backend",
+    "clientSecret": "<KC_CLIENT_SECRET>"
+  },
+  "keycloak": {
+    "tokenUrl": "http://localhost:8180/realms/e2e-test/protocol/openid-connect/token"
   },
   "n8n": {
     "url": "http://localhost:5678",
