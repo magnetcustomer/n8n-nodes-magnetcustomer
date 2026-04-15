@@ -48,6 +48,7 @@ export async function customerRequest(
 				cep: this.getNodeParameter('cep', index),
 				owners: [this.getNodeParameter('owners', index)],
 				customFields: addCustomFields(this.getNodeParameter('customFieldCollection', index) as object),
+				lifeCycle: 'customer',
 				source: 'n8n',
 			};
 			break;

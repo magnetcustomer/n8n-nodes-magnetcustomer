@@ -37,7 +37,12 @@ export async function discoverRequiredFields(
   for (const f of fields) {
     const s = f.settings || {};
     if (!s.required) continue;
-    if (f.system) continue; // system fields handled by node params (fullname, title, etc.)
+
+    // System fields with fieldRef (e.g. dealObj.title, dealObj.staff) are handled
+    // by the node's standard parameters. Skip those.
+    // System fields WITHOUT fieldRef are custom system fields that need to be
+    // sent via customFields (e.g. "Título do Negócio" in some tenants).
+    if (f.system && f.fieldRef) continue;
 
     // Check lifecycle-specific requirement for contact feature
     if (lifecycle && Array.isArray(s.requiredWhen) && s.requiredWhen.length > 0) {
