@@ -7,7 +7,7 @@ export class MagnetCustomerOAuth2Api implements ICredentialType {
 
 	displayName = 'MagnetCustomer OAuth2 API';
 
-	documentationUrl = 'https://developers.magnetcustomer.com';
+	documentationUrl = 'https://apireference.magnetcustomer.com';
 
 	properties: INodeProperties[] = [
 		{

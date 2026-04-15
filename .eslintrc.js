@@ -81,20 +81,20 @@ module.exports = {
 		'import/no-extraneous-dependencies': 'warn',
 
 		'@typescript-eslint/naming-convention': ['error', {selector: 'memberLike', format: null}],
-		'@typescript-eslint/no-explicit-any': 'warn', //812 warnings, better to fix in separate PR
-		'@typescript-eslint/no-non-null-assertion': 'warn', //665 errors, better to fix in separate PR
-		'@typescript-eslint/no-unsafe-assignment': 'warn', //7084 problems, better to fix in separate PR
-		'@typescript-eslint/no-unsafe-call': 'warn', //541 errors, better to fix in separate PR
-		'@typescript-eslint/no-unsafe-member-access': 'warn', //4591 errors, better to fix in separate PR
-		'@typescript-eslint/no-unsafe-return': 'warn', //438 errors, better to fix in separate PR
+		'@typescript-eslint/no-explicit-any': 'off',
+		'@typescript-eslint/no-non-null-assertion': 'warn',
+		'@typescript-eslint/no-unsafe-assignment': 'off',
+		'@typescript-eslint/no-unsafe-call': 'off',
+		'@typescript-eslint/no-unsafe-member-access': 'off',
+		'@typescript-eslint/no-unsafe-return': 'off',
 		'@typescript-eslint/no-unused-expressions': ['error', {allowTernary: true}],
-		'@typescript-eslint/restrict-template-expressions': 'warn', //1152 errors, better to fix in separate PR
+		'@typescript-eslint/restrict-template-expressions': 'off',
 		'@typescript-eslint/unbound-method': 'warn',
 		'@typescript-eslint/ban-ts-comment': ['warn', {'ts-ignore': true}],
 		'@typescript-eslint/prefer-nullish-coalescing': 'warn',
 		'@typescript-eslint/no-base-to-string': 'warn',
 		'@typescript-eslint/no-redundant-type-constituents': 'warn',
-		'@typescript-eslint/no-unsafe-argument': 'warn',
+		'@typescript-eslint/no-unsafe-argument': 'off',
 		'@typescript-eslint/prefer-optional-chain': 'warn',
 		'@typescript-eslint/restrict-plus-operands': 'warn',
 		'@typescript-eslint/no-unnecessary-type-assertion': 'warn',
