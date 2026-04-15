@@ -21,13 +21,13 @@ export async function customFieldBlockRequest(
 
 	if (['get', 'update', 'delete'].includes(operation)) {
 		blockId = this.getNodeParameter('blockId', index) as string;
-		endpoint = `/customfields/blocks/${blockId}`;
+		endpoint = `/customfieldblocks/${blockId}`;
 	}
 
 	switch (operation) {
 		case 'create':
 			requestMethod = 'POST';
-			endpoint = '/customfields/blocks';
+			endpoint = '/customfieldblocks';
 			body = {
 				name: this.getNodeParameter('name', index) as string,
 				feature: this.getNodeParameter('feature', index) as string,
@@ -55,7 +55,7 @@ export async function customFieldBlockRequest(
 
 		case 'getAll':
 			requestMethod = 'GET';
-			endpoint = '/customfields/blocks';
+			endpoint = '/customfieldblocks';
 			qs = {};
 			const pageGetAll = this.getNodeParameter('page', index, undefined) as number | undefined;
 			const limitGetAll = this.getNodeParameter('limit', index, undefined) as number | undefined;
@@ -64,7 +64,7 @@ export async function customFieldBlockRequest(
 			break;
 		case 'search':
 			requestMethod = 'GET';
-			endpoint = '/customfields/blocks';
+			endpoint = '/customfieldblocks';
 			qs = {};
 			const pageSearch = this.getNodeParameter('page', index, undefined) as number | undefined;
 			const limitSearch = this.getNodeParameter('limit', index, undefined) as number | undefined;

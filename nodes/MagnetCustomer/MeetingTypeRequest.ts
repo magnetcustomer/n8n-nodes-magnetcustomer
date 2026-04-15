@@ -21,12 +21,12 @@ const qs: IDataObject = {};
 	switch (operation) {
 		case 'get':
 			requestMethod = 'GET';
-			endpoint = `/meetings/types/${this.getNodeParameter('meetingTypeId', index)}`;
+			endpoint = `/meetingtypes/${this.getNodeParameter('meetingTypeId', index)}`;
 			break;
 
 		case 'getAll':
 			requestMethod = 'GET';
-			endpoint = '/meetings/types';
+			endpoint = '/meetingtypes';
 			{
 				const page = this.getNodeParameter('page', index, undefined) as number | undefined;
 				const limit = this.getNodeParameter('limit', index, undefined) as number | undefined;
@@ -40,7 +40,7 @@ const qs: IDataObject = {};
 				throw new Error('Parameter "name" is required for create operation');
 			}
 			requestMethod = 'POST';
-			endpoint = '/meetings/types';
+			endpoint = '/meetingtypes';
 			body = {
 				name: this.getNodeParameter('name', index),
 			};
@@ -50,7 +50,7 @@ const qs: IDataObject = {};
 			requestMethod = 'PUT';
 			{
 				const id = this.getNodeParameter('meetingTypeId', index) as string;
-				endpoint = `/meetings/types/${id}`;
+				endpoint = `/meetingtypes/${id}`;
 				const name = this.getNodeParameter('name', index);
 				if (name !== undefined && name !== null && name !== '') body.name = name as string;
 			}
@@ -58,12 +58,12 @@ const qs: IDataObject = {};
 
 		case 'delete':
 			requestMethod = 'DELETE';
-			endpoint = `/meetings/types/${this.getNodeParameter('meetingTypeId', index)}`;
+			endpoint = `/meetingtypes/${this.getNodeParameter('meetingTypeId', index)}`;
 			break;
 
 		case 'search':
 			requestMethod = 'GET';
-			endpoint = '/meetings/types';
+			endpoint = '/meetingtypes';
 			{
 				const page = this.getNodeParameter('page', index, undefined) as number | undefined;
 				const limit = this.getNodeParameter('limit', index, undefined) as number | undefined;
