@@ -112,7 +112,7 @@ export default async function globalSetup() {
   // Role — filter by name not empty to get a valid role
   try {
     const roles = await mcFetch('/roles');
-    const list = Array.isArray(roles) ? roles : roles?.data || [];
+    const list = Array.isArray(roles) ? roles : roles?.docs || roles?.data || [];
     const validRole = list.find((r: any) => r.name && r.name.trim() !== '');
     if (validRole) {
       context.roleId = validRole._id;
@@ -142,6 +142,16 @@ export default async function globalSetup() {
       console.log(`  CustomFieldType: ${list[0].name || list[0]._id}`);
     }
   } catch { console.warn('  CustomFieldType: not available'); }
+
+  // Calendar (for meeting creation)
+  try {
+    const calendars = await mcFetch('/calendars');
+    const calList = Array.isArray(calendars) ? calendars : calendars?.docs || calendars?.data || [];
+    if (calList.length > 0) {
+      context.calendarId = calList[0]._id;
+      console.log(`  Calendar: ${calList[0].name || calList[0]._id}`);
+    }
+  } catch { console.warn('  Calendar: not available'); }
 
   // Stage (for deal creation)
   if (context.pipelineId) {

@@ -6,6 +6,7 @@ import {
   getStaffId,
   getTaskTypeId,
   getStageId,
+  getCalendarId,
 } from './testContext';
 
 const PREFIX = () => getConfig().options.cleanupPrefix;
@@ -109,16 +110,15 @@ export function organizationCreate(overrides: Record<string, any> = {}) {
 }
 
 export function taskCreate(overrides: Record<string, any> = {}) {
-  const typeId = getTaskTypeId();
   return {
     resource: 'task',
     operation: 'create',
     params: {
       title: `${PREFIX()}Task ${Date.now()}`,
-      observation: 'E2E test task', type: typeId,
+      observation: 'E2E test task', type: getTaskTypeId(),
       dateOfExpires: '2027-12-31', associateWith: '',
       deal: '', contact: '', organization: '',
-      owner: '', dateFinished: '', status: 'open',
+      owner: getStaffId(), dateFinished: '', status: '',
       ...overrides,
     },
   };
@@ -173,8 +173,8 @@ export function meetingCreate(overrides: Record<string, any> = {}) {
       title: `${PREFIX()}Meeting ${Date.now()}`,
       start: new Date(Date.now() + 86400000).toISOString(),
       end: new Date(Date.now() + 90000000).toISOString(),
-      calendar: '', workspace: '', participants: [],
-      staff: '', type: '', room: '', contact: '', branch: '',
+      calendar: getCalendarId(), workspace: '', participants: [],
+      staff: getStaffId(), type: '', room: '', contact: '', branch: '',
       customFieldCollection: featureCustomFields('meeting'),
       ...overrides,
     },

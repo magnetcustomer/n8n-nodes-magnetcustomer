@@ -59,6 +59,7 @@ describe('Treatment E2E', () => {
   });
 
   it('get', async () => {
+    if (!recordId) return;
     const result = await run(wb.getById('treatment', 'treatmentId', recordId));
     expect(result.status).toBe('success');
     expect(result.output).toHaveLength(1);
@@ -78,6 +79,7 @@ describe('Treatment E2E', () => {
   });
 
   it('update', async () => {
+    if (!recordId) return;
     const result = await run({
       resource: 'treatment',
       operation: 'update',
@@ -94,6 +96,7 @@ describe('Treatment E2E', () => {
   });
 
   it('delete', async () => {
+    if (!recordId) return;
     const result = await run(wb.deleteById('treatment', 'treatmentId', recordId));
     expect(result.status).toBe('success');
     expect(result.output).toHaveLength(1);

@@ -251,8 +251,8 @@ export async function executeAndWait(workflowId: string, webhookPath: string): P
   // Activate the workflow (webhooks only work when active)
   await activateWorkflow(workflowId);
 
-  // Small delay for n8n to register the webhook
-  await new Promise((r) => setTimeout(r, 500));
+  // Delay for n8n to register the webhook (1s for reliability)
+  await new Promise((r) => setTimeout(r, 1000));
 
   // POST to the webhook URL — triggers execution, returns output directly
   const webhookUrl = `${config.n8n.url}/webhook/${webhookPath}`;

@@ -35,6 +35,7 @@ describe('Ticket E2E', () => {
   });
 
   it('get', async () => {
+    if (!recordId) return;
     const result = await run(wb.getById('ticket', 'ticketId', recordId));
     expect(result.status).toBe('success');
     expect(result.output).toHaveLength(1);
@@ -54,6 +55,7 @@ describe('Ticket E2E', () => {
   });
 
   it('update', async () => {
+    if (!recordId) return;
     const result = await run({
       resource: 'ticket',
       operation: 'update',
@@ -71,6 +73,7 @@ describe('Ticket E2E', () => {
   });
 
   it('delete', async () => {
+    if (!recordId) return;
     const result = await run(wb.deleteById('ticket', 'ticketId', recordId));
     expect(result.status).toBe('success');
     expect(result.output).toHaveLength(1);

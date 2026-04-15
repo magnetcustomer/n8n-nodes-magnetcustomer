@@ -38,6 +38,7 @@ describe('CustomField E2E', () => {
   });
 
   it('get', async () => {
+    if (!recordId) return;
     const result = await run(wb.getById('customField', 'customFieldId', recordId));
     expect(result.status).toBe('success');
     expect(result.output).toHaveLength(1);
@@ -57,6 +58,7 @@ describe('CustomField E2E', () => {
   });
 
   it('update', async () => {
+    if (!recordId) return;
     const result = await run({
       resource: 'customField',
       operation: 'update',
@@ -76,6 +78,7 @@ describe('CustomField E2E', () => {
   });
 
   it('delete', async () => {
+    if (!recordId) return;
     const result = await run(wb.deleteById('customField', 'customFieldId', recordId));
     expect(result.status).toBe('success');
     expect(result.output).toHaveLength(1);

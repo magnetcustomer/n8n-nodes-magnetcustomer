@@ -13,6 +13,7 @@ interface E2EContext {
   taskTypeId?: string;
   treatmentTypeId?: string;
   customFieldTypeId?: string;
+  calendarId?: string;
   credentialId?: string;
   // Dynamic required fields per feature/lifecycle (JSON-stringified DiscoveredField[])
   [key: string]: string | undefined;
@@ -95,4 +96,10 @@ export function getStageId(): string {
 export function getRoleId(): string {
   const c = getE2EContext();
   return c.roleId || '';
+}
+
+/** Get calendar ID from context (for meeting creation) */
+export function getCalendarId(): string {
+  const c = getE2EContext();
+  return c.calendarId || '';
 }

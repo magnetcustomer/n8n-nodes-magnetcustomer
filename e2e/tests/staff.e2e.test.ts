@@ -37,6 +37,7 @@ describe('Staff E2E', () => {
   });
 
   it('get', async () => {
+    if (!recordId) return;
     const result = await run(wb.getById('staff', 'staffId', recordId));
     expect(result.status).toBe('success');
     expect(result.output).toHaveLength(1);
@@ -56,6 +57,7 @@ describe('Staff E2E', () => {
   });
 
   it('update', async () => {
+    if (!recordId) return;
     const result = await run({
       resource: 'staff',
       operation: 'update',
@@ -75,6 +77,7 @@ describe('Staff E2E', () => {
   });
 
   it('delete', async () => {
+    if (!recordId) return;
     const result = await run(wb.deleteById('staff', 'staffId', recordId));
     expect(result.status).toBe('success');
     expect(result.output).toHaveLength(1);

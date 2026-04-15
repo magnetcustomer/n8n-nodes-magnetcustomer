@@ -62,12 +62,7 @@ export async function customFieldBlockRequest(
 				limit: this.getNodeParameter('limit', index, 15) as number,
 				search: operation === 'search' ? this.getNodeParameter('search', index, '') : '',
 			};
-			const featureFilter = this.getNodeParameter('feature', index) as string | undefined;
-			if (featureFilter) {
-				qs.feature = featureFilter;
-			}
-			// TODO: Add pagination if API supports it (page? limit?)
-			// Add optional filters
+			// Add optional filters (feature is inside the filters collection for getAll/search)
 			const filters = this.getNodeParameter('filters', index, {}) as {
 				feature?: string;
 				emailsEmpty?: boolean;
