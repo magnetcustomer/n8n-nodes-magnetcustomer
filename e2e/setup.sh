@@ -5,10 +5,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 CONFIG_FILE="$SCRIPT_DIR/config/e2e.config.json"
 
-# n8n 2.x owner credentials (password must have uppercase + number)
-N8N_EMAIL="e2e@magnetcustomer.com"
-N8N_PASSWORD="<E2E_PASSWORD>"
-
 # Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -20,7 +16,16 @@ NC='\033[0m'
 if [ ! -f "$CONFIG_FILE" ]; then
   echo -e "${RED}Config not found: $CONFIG_FILE${NC}"
   echo -e "${YELLOW}Run: cp e2e/config/e2e.config.example.json e2e/config/e2e.config.json${NC}"
-  echo -e "${YELLOW}Then fill in magnetCustomer credentials (apiUrl, clientId, clientSecret)${NC}"
+  echo -e "${YELLOW}Then fill in all credentials (magnetCustomer, keycloak, n8n)${NC}"
+  exit 1
+fi
+
+# n8n credentials — read from config file
+N8N_EMAIL=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['n8n']['email'])")
+N8N_PASSWORD=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['n8n']['password'])")
+
+if [ -z "$N8N_EMAIL" ] || [ -z "$N8N_PASSWORD" ]; then
+  echo -e "${RED}n8n.email and n8n.password must be set in $CONFIG_FILE${NC}"
   exit 1
 fi
 
@@ -157,8 +162,8 @@ KC_TOKEN_URL=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['k
 MC_CLIENT_ID=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['magnetCustomer']['clientId'])")
 MC_CLIENT_SECRET=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['magnetCustomer']['clientSecret'])")
 MC_SUB_DOMAIN=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['magnetCustomer']['subDomainAccount'])")
-KC_USERNAME=$(python3 -c "import json; c=json.load(open('$CONFIG_FILE')); print(c.get('keycloak',{}).get('username','e2e-admin'))")
-KC_PASSWORD=$(python3 -c "import json; c=json.load(open('$CONFIG_FILE')); print(c.get('keycloak',{}).get('password','<KC_PASSWORD>'))")
+KC_USERNAME=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['keycloak']['username'])")
+KC_PASSWORD=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['keycloak']['password'])")
 
 KC_RESPONSE=$(curl -sf -X POST "$KC_TOKEN_URL" \
   -d "client_id=$MC_CLIENT_ID&client_secret=$MC_CLIENT_SECRET&grant_type=password&username=$KC_USERNAME&password=$KC_PASSWORD" 2>/dev/null || echo "")

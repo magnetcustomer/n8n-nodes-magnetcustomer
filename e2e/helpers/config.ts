@@ -11,12 +11,14 @@ export interface E2EConfig {
   };
   keycloak: {
     tokenUrl: string;
-    username?: string;
-    password?: string;
+    username: string;
+    password: string;
   };
   n8n: {
     url: string;
     apiKey: string;
+    email: string;
+    password: string;
   };
   options: {
     triggerMode: 'simulated' | 'real';
@@ -47,7 +49,11 @@ export function loadConfig(): E2EConfig {
     [raw.magnetCustomer?.clientId, 'magnetCustomer.clientId'],
     [raw.magnetCustomer?.clientSecret, 'magnetCustomer.clientSecret'],
     [raw.keycloak?.tokenUrl, 'keycloak.tokenUrl'],
+    [raw.keycloak?.username, 'keycloak.username'],
+    [raw.keycloak?.password, 'keycloak.password'],
     [raw.n8n?.url, 'n8n.url'],
+    [raw.n8n?.email, 'n8n.email'],
+    [raw.n8n?.password, 'n8n.password'],
   ];
 
   for (const [value, name] of required) {
@@ -80,8 +86,8 @@ export async function getApiToken(): Promise<string> {
       client_id: config.magnetCustomer.clientId,
       client_secret: config.magnetCustomer.clientSecret,
       grant_type: 'password',
-      username: config.keycloak.username || 'e2e-admin',
-      password: config.keycloak.password || '<KC_PASSWORD>',
+      username: config.keycloak.username,
+      password: config.keycloak.password,
     }),
   });
 

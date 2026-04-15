@@ -49,8 +49,8 @@ async function ensureSession(): Promise<string> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      emailOrLdapLoginId: 'e2e@magnetcustomer.com',
-      password: '<E2E_PASSWORD>',
+      emailOrLdapLoginId: config.n8n.email,
+      password: config.n8n.password,
     }),
   });
 

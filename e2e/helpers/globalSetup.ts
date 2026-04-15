@@ -8,10 +8,11 @@ const CONTEXT_FILE = path.resolve(__dirname, '../config/.e2e-context.json');
 
 /** Login to n8n internal REST and return session cookie */
 async function n8nLogin(baseUrl: string): Promise<string> {
+  const config = loadConfig();
   const res = await fetch(`${baseUrl}/rest/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ emailOrLdapLoginId: 'e2e@magnetcustomer.com', password: '<E2E_PASSWORD>' }),
+    body: JSON.stringify({ emailOrLdapLoginId: config.n8n.email, password: config.n8n.password }),
   });
   const cookies = (res.headers as any).getSetCookie?.() || [];
   return (cookies[0] || res.headers.get('set-cookie') || '').split(';')[0];
