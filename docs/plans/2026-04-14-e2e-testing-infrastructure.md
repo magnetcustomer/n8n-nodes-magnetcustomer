@@ -144,7 +144,7 @@ OWNER_RESPONSE=$(curl -sf -X POST "$N8N_URL/rest/owner/setup" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "e2e@magnetcustomer.com",
-    "password": "<E2E_PASSWORD>",
+    "password": "<N8N_PASSWORD>",
     "firstName": "E2E",
     "lastName": "Test"
   }' 2>/dev/null) || echo "Owner already exists, skipping"
@@ -153,7 +153,7 @@ OWNER_RESPONSE=$(curl -sf -X POST "$N8N_URL/rest/owner/setup" \
 COOKIE=$(curl -sf -X POST "$N8N_URL/rest/login" \
   -H "Content-Type: application/json" \
   -D - \
-  -d '{"email":"e2e@magnetcustomer.com","password":"<E2E_PASSWORD>"}' \
+  -d '{"email":"e2e@magnetcustomer.com","password":"<N8N_PASSWORD>"}' \
   2>/dev/null | grep -i 'set-cookie' | head -1 | sed 's/.*: //' | sed 's/;.*//')
 
 echo -e "${YELLOW}[5/6] Generating API key...${NC}"
