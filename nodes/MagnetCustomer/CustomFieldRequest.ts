@@ -42,11 +42,20 @@ export async function customFieldRequest(
 				feature: this.getNodeParameter('feature', index) as string,
 				fieldType: this.getNodeParameter('fieldType', index) as string,
 				order: this.getNodeParameter('order', index) as number,
-				// TODO: Add other optional fields (active, required, values, fieldRef)
-				values: (this.getNodeParameter('values', index, []) as string[]).map(val => ({ value: val })),
-				subFieldSettings: (() => { try { return JSON.parse(this.getNodeParameter('subFieldSettings', index, '{}') as string); } catch { return {}; } })(),
-				settings: this.getNodeParameter('settings', index, {}) as object,
 			};
+			// Optional: values
+			const valuesRaw = this.getNodeParameter('values', index, []) as string[];
+			if (valuesRaw.length > 0) {
+				body.values = valuesRaw.map(val => ({ value: val }));
+			}
+			// Optional: subFieldSettings (only if non-empty JSON with actual content)
+			try {
+				const sfs = JSON.parse(this.getNodeParameter('subFieldSettings', index, '{}') as string);
+				if (sfs && Object.keys(sfs).length > 0) body.subFieldSettings = sfs;
+			} catch { /* invalid JSON, skip */ }
+			// Optional: settings
+			const settingsVal = this.getNodeParameter('settings', index, {}) as object;
+			if (settingsVal && Object.keys(settingsVal).length > 0) body.settings = settingsVal;
 			// Send request for create
 			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 			// Debug optional
