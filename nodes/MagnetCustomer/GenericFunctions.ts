@@ -57,7 +57,9 @@ export async function magnetCustomerApiRequest(
 		method,
 		qs,
 		body,
-		uri: uri ?? `https://${credentials.subDomainAccount}.platform-api.magnetcustomer.com/api${resource}`,
+		uri: uri ?? (process.env.MAGNETCUSTOMER_API_BASE_URL
+			? `${process.env.MAGNETCUSTOMER_API_BASE_URL}/api${resource}`
+			: `https://${credentials.subDomainAccount}.platform-api.magnetcustomer.com/api${resource}`),
 		json: true,
 		headers: {},
 		qsStringifyOptions: {

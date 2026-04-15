@@ -173,6 +173,22 @@ else
   echo -e "${YELLOW}  Credential creation returned HTTP $CRED_CODE (may already exist)${NC}"
 fi
 
+# ------------------------------------------------------------------ community package
+
+echo -e "${YELLOW}[7/7] Installing MagnetCustomer node...${NC}"
+INSTALL_CODE=$(curl -sf -o /dev/null -w "%{http_code}" -X POST "$N8N_URL/rest/community-packages" \
+  -H "Cookie: $COOKIE" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"@magnetcustomer/n8n-nodes-magnetcustomer"}' 2>/dev/null || echo "000")
+
+if [ "$INSTALL_CODE" = "200" ]; then
+  echo -e "${GREEN}  Node installed from npm${NC}"
+elif [ "$INSTALL_CODE" = "409" ]; then
+  echo -e "${GREEN}  Node already installed${NC}"
+else
+  echo -e "${YELLOW}  Node install returned HTTP $INSTALL_CODE (may already be installed)${NC}"
+fi
+
 # ------------------------------------------------------------------ done
 
 echo ""

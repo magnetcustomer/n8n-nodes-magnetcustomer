@@ -38,7 +38,7 @@ async function run(config: { resource: string; operation: string; params: Record
   const wf = await n8nClient.createWorkflow({ ...config, credentialId });
   workflowIds.push(wf.id);
   n8nClient.trackWorkflow(wf.id);
-  return n8nClient.executeAndWait(wf.id);
+  return n8nClient.executeAndWait(wf.id, wf.webhookPath);
 }
 
 describe('Treatment E2E', () => {
