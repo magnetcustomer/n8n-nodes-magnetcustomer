@@ -1,12 +1,24 @@
 // e2e/helpers/workflowBuilder.ts
 import { getConfig } from './config';
-import { getRequiredCustomFields, getE2EContext } from './testContext';
+import {
+  getRequiredFieldsForFeature,
+  getE2EContext,
+  getStaffId,
+  getTaskTypeId,
+  getStageId,
+} from './testContext';
 
 const PREFIX = () => getConfig().options.cleanupPrefix;
 
 /** Merge required custom fields from globalSetup with any test-provided ones */
 function contactCustomFields(lifecycle: 'prospect' | 'customer' | 'lead', overrideFields: any[] = []): { customFields: any[] } {
-  const required = getRequiredCustomFields(lifecycle);
+  const required = getRequiredFieldsForFeature('contact', lifecycle);
+  return { customFields: [...required, ...overrideFields] };
+}
+
+/** Build customFieldCollection for any feature */
+function featureCustomFields(feature: string, overrideFields: any[] = []): { customFields: any[] } {
+  const required = getRequiredFieldsForFeature(feature);
   return { customFields: [...required, ...overrideFields] };
 }
 
@@ -65,7 +77,6 @@ export function leadCreate(overrides: Record<string, any> = {}) {
 }
 
 export function dealCreate(pipelineId: string, overrides: Record<string, any> = {}) {
-  const ctx = getE2EContext();
   return {
     resource: 'deal',
     operation: 'create',
@@ -73,9 +84,9 @@ export function dealCreate(pipelineId: string, overrides: Record<string, any> = 
       title: `${PREFIX()}Deal ${Date.now()}`,
       description: 'E2E test deal',
       amount: 1000, expectedCloseDate: '2027-12-31',
-      pipeline: pipelineId, stage: ctx.stageId || '', staff: '',
+      pipeline: pipelineId, stage: getStageId(), staff: getStaffId(),
       associateWith: '', contact: '', organization: '',
-      customFieldCollection: { customFields: [] },
+      customFieldCollection: featureCustomFields('deal'),
       ...overrides,
     },
   };
@@ -91,19 +102,20 @@ export function organizationCreate(overrides: Record<string, any> = {}) {
       phoneCollection: DEFAULT_PHONE, birthDate: '',
       doc: '', state: '', city: '', address: '',
       addressNumber: '', complement: '', neighborhood: '', cep: '',
-      owners: '', customFieldCollection: { customFields: [] },
+      owners: '', customFieldCollection: featureCustomFields('organization'),
       ...overrides,
     },
   };
 }
 
 export function taskCreate(overrides: Record<string, any> = {}) {
+  const typeId = getTaskTypeId();
   return {
     resource: 'task',
     operation: 'create',
     params: {
       title: `${PREFIX()}Task ${Date.now()}`,
-      observation: 'E2E test task', type: '',
+      observation: 'E2E test task', type: typeId,
       dateOfExpires: '2027-12-31', associateWith: '',
       deal: '', contact: '', organization: '',
       owner: '', dateFinished: '', status: 'open',
@@ -134,7 +146,7 @@ export function staffCreate(roleId: string, overrides: Record<string, any> = {})
       email: `${PREFIX()}staff-${Date.now()}@test.com`,
       role: roleId, workspaces: [],
       phone: '', whatsAppPhone: '',
-      customFieldCollection: { customFields: [] },
+      customFieldCollection: featureCustomFields('staff'),
       ...overrides,
     },
   };
@@ -163,6 +175,7 @@ export function meetingCreate(overrides: Record<string, any> = {}) {
       end: new Date(Date.now() + 90000000).toISOString(),
       calendar: '', workspace: '', participants: [],
       staff: '', type: '', room: '', contact: '', branch: '',
+      customFieldCollection: featureCustomFields('meeting'),
       ...overrides,
     },
   };

@@ -2,7 +2,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { loadConfig, getApiToken } from './config';
-import * as mcClient from './mcClient';
+import { discoverRequiredFields } from './fieldDiscovery';
 
 const CONTEXT_FILE = path.resolve(__dirname, '../config/.e2e-context.json');
 
@@ -92,10 +92,6 @@ export default async function globalSetup() {
   }
 
   // 7. Fetch base data for dependent test suites
-  // Use the fresh token for mcClient auth
-  // (mcClient uses config.magnetCustomer.clientSecret which is the Keycloak secret,
-  //  but we need a bearer token. Let's use direct fetch with the API token.)
-
   const mcFetch = async (endpoint: string) => {
     const res = await fetch(`${config.magnetCustomer.apiUrl}/api${endpoint}`, {
       headers: { 'Authorization': `Bearer ${apiToken}` },
@@ -103,6 +99,7 @@ export default async function globalSetup() {
     return res.ok ? res.json() : null;
   };
 
+  // Pipeline
   try {
     const pipelines = await mcFetch('/pipelines');
     const list = Array.isArray(pipelines) ? pipelines : pipelines?.docs || pipelines?.data || [];
@@ -112,15 +109,21 @@ export default async function globalSetup() {
     }
   } catch { console.warn('  Pipeline: not available'); }
 
+  // Role — filter by name not empty to get a valid role
   try {
     const roles = await mcFetch('/roles');
     const list = Array.isArray(roles) ? roles : roles?.data || [];
-    if (list.length > 0) {
+    const validRole = list.find((r: any) => r.name && r.name.trim() !== '');
+    if (validRole) {
+      context.roleId = validRole._id;
+      console.log(`  Role: ${validRole.name} (${validRole._id})`);
+    } else if (list.length > 0) {
       context.roleId = list[0]._id;
-      console.log(`  Role: ${list[0].name || list[0]._id}`);
+      console.log(`  Role: ${list[0]._id} (fallback — no named role found)`);
     }
   } catch { console.warn('  Role: not available'); }
 
+  // TreatmentType
   try {
     const types = await mcFetch('/treatments/types');
     const list = Array.isArray(types) ? types : types?.data || [];
@@ -130,6 +133,7 @@ export default async function globalSetup() {
     }
   } catch { console.warn('  TreatmentType: not available'); }
 
+  // CustomFieldType
   try {
     const types = await mcFetch('/customfieldtypes');
     const list = Array.isArray(types) ? types : types?.data || [];
@@ -139,7 +143,7 @@ export default async function globalSetup() {
     }
   } catch { console.warn('  CustomFieldType: not available'); }
 
-  // 8. Fetch first stage for the pipeline (required for deal creation)
+  // Stage (for deal creation)
   if (context.pipelineId) {
     try {
       const stages = await mcFetch(`/pipelines/${context.pipelineId}/stages`);
@@ -151,38 +155,56 @@ export default async function globalSetup() {
     } catch { console.warn('  Stage: not available'); }
   }
 
-  // 9. Discover required custom fields per lifecycle (prospect, customer, lead)
+  // TaskType — first active task type for task creation
   try {
-    const allFields = await mcFetch('/customfields?feature=contact&creatable=true');
-    const fields = Array.isArray(allFields) ? allFields : allFields?.docs || allFields?.data || [];
-
-    for (const lifecycle of ['prospect', 'customer', 'lead'] as const) {
-      const requiredCFs: Array<{ customField: string; v: string; name: string }> = [];
-
-      for (const f of fields) {
-        const s = f.settings || {};
-        const isRequired = s.required && Array.isArray(s.requiredWhen) &&
-          s.requiredWhen.includes(lifecycle);
-
-        if (isRequired && !f.system && f.values?.length > 0) {
-          requiredCFs.push({
-            customField: f._id,
-            v: f.values[0]._id,
-            name: f.name,
-          });
-        }
-      }
-
-      if (requiredCFs.length > 0) {
-        (context as any)[`requiredCustomFields_${lifecycle}`] = JSON.stringify(requiredCFs);
-        console.log(`  Required CFs (${lifecycle}): ${requiredCFs.length} fields`);
-      }
+    const types = await mcFetch('/tasks/types');
+    const list = Array.isArray(types) ? types : types?.docs || types?.data || [];
+    const activeType = list.find((t: any) => t.active !== false) || list[0];
+    if (activeType) {
+      context.taskTypeId = activeType._id;
+      console.log(`  TaskType: ${activeType.name || activeType._id}`);
     }
-  } catch (e: any) {
-    console.warn(`  Required custom fields: ${e.message || 'not available'}`);
+  } catch { console.warn('  TaskType: not available'); }
+
+  // StaffId — first active staff (needed for deal/pipeline creation)
+  try {
+    const staffs = await mcFetch('/staffs?limit=5');
+    const list = Array.isArray(staffs) ? staffs : staffs?.docs || staffs?.data || [];
+    const activeStaff = list.find((s: any) => s.active !== false) || list[0];
+    if (activeStaff) {
+      context.staffId = activeStaff._id;
+      console.log(`  Staff: ${activeStaff.fullname || activeStaff._id}`);
+    }
+  } catch { console.warn('  Staff: not available'); }
+
+  // 8. Discover required custom fields per feature/lifecycle using fieldDiscovery engine
+  const featureConfigs = [
+    { feature: 'contact', lifecycle: 'prospect', key: 'requiredFields_prospect' },
+    { feature: 'contact', lifecycle: 'customer', key: 'requiredFields_customer' },
+    { feature: 'contact', lifecycle: 'lead', key: 'requiredFields_lead' },
+    { feature: 'deal', key: 'requiredFields_deal' },
+    { feature: 'organization', key: 'requiredFields_organization' },
+    { feature: 'staff', key: 'requiredFields_staff' },
+    { feature: 'meeting', key: 'requiredFields_meeting' },
+    { feature: 'task', key: 'requiredFields_task' },
+    { feature: 'ticket', key: 'requiredFields_ticket' },
+  ];
+
+  for (const cfg of featureConfigs) {
+    try {
+      const fields = await discoverRequiredFields(
+        config.magnetCustomer.apiUrl, apiToken, cfg.feature, cfg.lifecycle,
+      );
+      if (fields.length > 0) {
+        context[cfg.key] = JSON.stringify(fields);
+        console.log(`  Required fields (${cfg.key}): ${fields.map(f => `${f.name}[${f.fieldType}]`).join(', ')}`);
+      }
+    } catch (e: any) {
+      console.warn(`  Required fields (${cfg.key}): ${e.message || 'discovery failed'}`);
+    }
   }
 
-  // 10. Save context
+  // 9. Save context
   fs.writeFileSync(CONTEXT_FILE, JSON.stringify(context, null, 2));
   console.log('[E2E Global Setup] Done.\n');
 }

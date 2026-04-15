@@ -1,7 +1,7 @@
 import * as n8nClient from '../helpers/n8nClient';
 import * as wb from '../helpers/workflowBuilder';
 import * as mcClient from '../helpers/mcClient';
-import { getCredentialId, getE2EContext } from '../helpers/testContext';
+import { getCredentialId, getE2EContext, getRequiredFieldsForFeature } from '../helpers/testContext';
 import { getConfig } from '../helpers/config';
 
 let credentialId: string;
@@ -14,12 +14,18 @@ beforeAll(async () => {
   const ctx = getE2EContext();
   treatmentTypeId = ctx.treatmentTypeId || '';
 
-  // Create a contact if none provided in context
+  // Create a contact with required custom fields for prospect lifecycle
   const prefix = getConfig().options.cleanupPrefix;
+  const reqFields = getRequiredFieldsForFeature('contact', 'prospect');
+  const customFields = reqFields.map(f => ({ customField: f._id, v: f.v }));
+
   const contact = await mcClient.post('/prospects', {
     fullname: `${prefix}TreatmentContact ${Date.now()}`,
     email: `${prefix}treatment-contact-${Date.now()}@test.com`,
+    phones: [{ typePhone: 'business', number: '+5511999990000' }],
     type: 'pf',
+    customFields,
+    source: 'n8n',
   });
   contactId = contact._id || contact.data?._id;
 });

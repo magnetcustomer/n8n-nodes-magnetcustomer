@@ -1,6 +1,6 @@
 import * as n8nClient from '../helpers/n8nClient';
 import * as wb from '../helpers/workflowBuilder';
-import { getCredentialId, getE2EContext } from '../helpers/testContext';
+import { getCredentialId, getE2EContext, getStaffId, getStageId } from '../helpers/testContext';
 import { getConfig } from '../helpers/config';
 
 let credentialId: string;
@@ -67,8 +67,8 @@ describe('Deal E2E', () => {
         amount: 2000,
         expectedCloseDate: '',
         pipeline: pipelineId,
-        stage: '',
-        staff: '',
+        stage: getStageId(),
+        staff: getStaffId(),
         associateWith: '',
         contact: '',
         organization: '',

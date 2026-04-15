@@ -1,6 +1,6 @@
 import * as n8nClient from '../helpers/n8nClient';
 import * as wb from '../helpers/workflowBuilder';
-import { getCredentialId, getE2EContext } from '../helpers/testContext';
+import { getCredentialId, getRoleId } from '../helpers/testContext';
 import { getConfig } from '../helpers/config';
 
 let credentialId: string;
@@ -9,8 +9,7 @@ const workflowIds: string[] = [];
 
 beforeAll(() => {
   credentialId = getCredentialId();
-  const ctx = getE2EContext();
-  roleId = ctx.roleId || '';
+  roleId = getRoleId();
 });
 
 afterAll(async () => {
