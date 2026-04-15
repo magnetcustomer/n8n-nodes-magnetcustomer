@@ -97,6 +97,7 @@ export async function magnetCustomerApiRequest(
 
 	try {
 		const credentialType = authenticationMethod === 'apiToken' ? 'magnetCustomerApi' : 'magnetCustomerOAuth2Api';
+		// eslint-disable-next-line @typescript-eslint/return-await -- await required for catch to work
 		return await this.helpers.requestWithAuthentication.call(this, credentialType, options,);
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
