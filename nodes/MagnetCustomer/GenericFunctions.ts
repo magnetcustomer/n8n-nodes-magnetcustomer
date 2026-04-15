@@ -68,6 +68,26 @@ export async function magnetCustomerApiRequest(
 	};
 
 	options = Object.assign({}, options, option);
+
+	// Strip empty reference fields — the API rejects "" as invalid ObjectId.
+	// Fields like contact, staff, deal etc. must be omitted when not set.
+	if (body && typeof body === 'object') {
+		const refFields = [
+			'contact', 'organization', 'staff', 'deal', 'owner', 'pipeline',
+			'stage', 'type', 'room', 'calendar', 'workspace', 'workspaceReceiver',
+			'branch', 'ticket', 'meeting', 'treatment',
+		];
+		for (const field of refFields) {
+			if (body[field] === '' || body[field] === undefined || body[field] === null) {
+				delete body[field];
+			}
+		}
+		if (Array.isArray(body.owners)) {
+			body.owners = (body.owners as string[]).filter((o) => o !== '' && o !== undefined && o !== null);
+			if ((body.owners as string[]).length === 0) delete body.owners;
+		}
+	}
+
 	if (Object.keys(options.body as IDataObject).length === 0) {
 		delete options.body;
 	}
