@@ -44,7 +44,7 @@ export async function customFieldRequest(
 				order: this.getNodeParameter('order', index) as number,
 				// TODO: Add other optional fields (active, required, values, fieldRef)
 				values: (this.getNodeParameter('values', index, []) as string[]).map(val => ({ value: val })),
-				subFieldSettings: JSON.parse(this.getNodeParameter('subFieldSettings', index, '{}') as string),
+				subFieldSettings: (() => { try { return JSON.parse(this.getNodeParameter('subFieldSettings', index, '{}') as string); } catch { return {}; } })(),
 				settings: this.getNodeParameter('settings', index, {}) as object,
 			};
 			// Send request for create

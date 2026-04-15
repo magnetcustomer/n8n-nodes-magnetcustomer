@@ -54,34 +54,23 @@ export async function customFieldBlockRequest(
 			break;
 
 		case 'getAll':
+			requestMethod = 'GET';
+			endpoint = '/customfields/blocks';
+			qs = {};
+			const pageGetAll = this.getNodeParameter('page', index, undefined) as number | undefined;
+			const limitGetAll = this.getNodeParameter('limit', index, undefined) as number | undefined;
+			if (typeof pageGetAll === 'number' && pageGetAll > 0) qs.page = pageGetAll;
+			if (typeof limitGetAll === 'number' && limitGetAll > 0) qs.limit = limitGetAll;
+			break;
 		case 'search':
 			requestMethod = 'GET';
 			endpoint = '/customfields/blocks';
-			qs = {
-				page: this.getNodeParameter('page', index, 1) as number,
-				limit: this.getNodeParameter('limit', index, 15) as number,
-				search: operation === 'search' ? this.getNodeParameter('search', index, '') : '',
-			};
-			// Add optional filters (feature is inside the filters collection for getAll/search)
-			const filters = this.getNodeParameter('filters', index, {}) as {
-				feature?: string;
-				emailsEmpty?: boolean;
-				phonesEmpty?: boolean;
-				interactionsEmpty?: boolean;
-			};
-			if (filters.feature) qs.feature = filters.feature;
-			if (filters.emailsEmpty !== undefined) qs.emailsEmpty = filters.emailsEmpty;
-			if (filters.phonesEmpty !== undefined) qs.phonesEmpty = filters.phonesEmpty;
-			if (filters.interactionsEmpty !== undefined) qs.interactionsEmpty = filters.interactionsEmpty;
-
-			// Add optional sorting
-			const sort = this.getNodeParameter('sort', index, {}) as {
-				sortBy?: string;
-				sortType?: string;
-			};
-			if (sort.sortBy) qs.sortBy = sort.sortBy;
-			if (sort.sortType) qs.sortType = sort.sortType;
-
+			qs = {};
+			const pageSearch = this.getNodeParameter('page', index, undefined) as number | undefined;
+			const limitSearch = this.getNodeParameter('limit', index, undefined) as number | undefined;
+			if (typeof pageSearch === 'number' && pageSearch > 0) qs.page = pageSearch;
+			if (typeof limitSearch === 'number' && limitSearch > 0) qs.limit = limitSearch;
+			qs.search = this.getNodeParameter('search', index) as string;
 			break;
 
 		case 'update':
@@ -93,9 +82,6 @@ export async function customFieldBlockRequest(
 			}
 			if (this.getNodeParameter('feature', index)) {
 				body.feature = this.getNodeParameter('feature', index) as string;
-			}
-			if (this.getNodeParameter('order', index) !== undefined) {
-				body.order = this.getNodeParameter('order', index) as number;
 			}
 			if (this.getNodeParameter('position', index) !== undefined) {
 				body.position = this.getNodeParameter('position', index) as number;
