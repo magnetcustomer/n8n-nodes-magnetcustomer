@@ -139,38 +139,50 @@ export default async function globalSetup() {
     }
   } catch { console.warn('  CustomFieldType: not available'); }
 
-  // 8. Discover required custom fields for contact-like resources
+  // 8. Fetch first stage for the pipeline (required for deal creation)
+  if (context.pipelineId) {
+    try {
+      const stages = await mcFetch(`/pipelines/${context.pipelineId}/stages`);
+      const stageList = Array.isArray(stages) ? stages : stages?.docs || stages?.data || [];
+      if (stageList.length > 0) {
+        context.stageId = stageList[0]._id;
+        console.log(`  Stage: ${stageList[0].title || stageList[0].name || stageList[0]._id}`);
+      }
+    } catch { console.warn('  Stage: not available'); }
+  }
+
+  // 9. Discover required custom fields per lifecycle (prospect, customer, lead)
   try {
     const allFields = await mcFetch('/customfields?feature=contact&creatable=true');
     const fields = Array.isArray(allFields) ? allFields : allFields?.docs || allFields?.data || [];
 
-    const requiredCustomFields: Array<{ customField: string; v: string; name: string }> = [];
+    for (const lifecycle of ['prospect', 'customer', 'lead'] as const) {
+      const requiredCFs: Array<{ customField: string; v: string; name: string }> = [];
 
-    for (const f of fields) {
-      const s = f.settings || {};
-      const isRequired = s.required && Array.isArray(s.requiredWhen) &&
-        (s.requiredWhen.includes('prospect') || s.requiredWhen.includes('customer') || s.requiredWhen.includes('lead'));
+      for (const f of fields) {
+        const s = f.settings || {};
+        const isRequired = s.required && Array.isArray(s.requiredWhen) &&
+          s.requiredWhen.includes(lifecycle);
 
-      if (isRequired && !f.system && f.values?.length > 0) {
-        // Enum/set custom field — use first value
-        requiredCustomFields.push({
-          customField: f._id,
-          v: f.values[0]._id,
-          name: f.name,
-        });
-        console.log(`  Required CF: ${f.name} → ${f.values[0].value}`);
+        if (isRequired && !f.system && f.values?.length > 0) {
+          requiredCFs.push({
+            customField: f._id,
+            v: f.values[0]._id,
+            name: f.name,
+          });
+        }
       }
-    }
 
-    if (requiredCustomFields.length > 0) {
-      (context as any).requiredCustomFields = JSON.stringify(requiredCustomFields);
-      console.log(`  Total required custom fields: ${requiredCustomFields.length}`);
+      if (requiredCFs.length > 0) {
+        (context as any)[`requiredCustomFields_${lifecycle}`] = JSON.stringify(requiredCFs);
+        console.log(`  Required CFs (${lifecycle}): ${requiredCFs.length} fields`);
+      }
     }
   } catch (e: any) {
     console.warn(`  Required custom fields: ${e.message || 'not available'}`);
   }
 
-  // 9. Save context
+  // 10. Save context
   fs.writeFileSync(CONTEXT_FILE, JSON.stringify(context, null, 2));
   console.log('[E2E Global Setup] Done.\n');
 }

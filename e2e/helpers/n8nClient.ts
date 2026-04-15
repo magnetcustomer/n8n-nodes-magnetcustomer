@@ -215,6 +215,34 @@ export async function createTriggerWorkflow(
   return { id: result.id, webhookPath };
 }
 
+export async function createSimpleWebhookWorkflow(name: string): Promise<{ id: string; webhookPath: string }> {
+  const webhookPath = name;
+  const body = {
+    name,
+    nodes: [
+      {
+        parameters: { httpMethod: 'POST', path: webhookPath, responseMode: 'lastNode', options: {} },
+        id: 'w1', name: 'Webhook', type: 'n8n-nodes-base.webhook', typeVersion: 2,
+        position: [0, 0], webhookId: webhookPath,
+      },
+      {
+        parameters: {},
+        id: 'n1', name: 'NoOp', type: 'n8n-nodes-base.noOp', typeVersion: 1,
+        position: [220, 0],
+      },
+    ],
+    connections: { Webhook: { main: [[{ node: 'NoOp', type: 'main', index: 0 }]] } },
+    settings: { executionOrder: 'v1' },
+  };
+
+  const result = await n8nFetch('/rest/workflows', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+  return { id: result.id, webhookPath };
+}
+
 // ------------------------------------------------------------------ execution
 
 export async function executeAndWait(workflowId: string, webhookPath: string): Promise<ExecutionResult> {

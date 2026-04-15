@@ -26,15 +26,15 @@ fi
 
 # ------------------------------------------------------------------ build
 
-echo -e "${YELLOW}[1/6] Building node...${NC}"
+echo -e "${YELLOW}[1/8] Building node...${NC}"
 cd "$ROOT_DIR" && npm run build
 
 # ------------------------------------------------------------------ docker
 
-echo -e "${YELLOW}[2/6] Starting n8n container...${NC}"
+echo -e "${YELLOW}[2/8] Starting n8n container...${NC}"
 cd "$SCRIPT_DIR" && docker compose up -d --build
 
-echo -e "${YELLOW}[3/6] Waiting for n8n health...${NC}"
+echo -e "${YELLOW}[3/8] Waiting for n8n health...${NC}"
 N8N_URL="http://localhost:5678"
 RETRIES=60
 for i in $(seq 1 $RETRIES); do
@@ -52,7 +52,7 @@ done
 
 # ------------------------------------------------------------------ owner
 
-echo -e "${YELLOW}[4/6] Setting up owner account...${NC}"
+echo -e "${YELLOW}[4/8] Setting up owner account...${NC}"
 SETUP_CODE=$(curl -sf -o /dev/null -w "%{http_code}" -X POST "$N8N_URL/rest/owner/setup" \
   -H "Content-Type: application/json" \
   -d "{\"email\":\"$N8N_EMAIL\",\"password\":\"$N8N_PASSWORD\",\"firstName\":\"E2E\",\"lastName\":\"Test\"}" 2>/dev/null || echo "000")
@@ -66,15 +66,15 @@ else
 fi
 
 # Login — n8n 2.x uses emailOrLdapLoginId
-# Use -D file to capture headers separately from body (mixing with -D - is unreliable)
+# Use -D file to capture headers separately from body
 curl -s -X POST "$N8N_URL/rest/login" \
   -H "Content-Type: application/json" \
-  -D /tmp/n8n-e2e-login-headers.txt \
+  -D /tmp/n8n-e2e-headers.txt \
   -o /dev/null \
   -d "{\"emailOrLdapLoginId\":\"$N8N_EMAIL\",\"password\":\"$N8N_PASSWORD\"}"
 
-COOKIE=$(grep -i 'set-cookie' /tmp/n8n-e2e-login-headers.txt 2>/dev/null | head -1 | sed 's/[Ss]et-[Cc]ookie: //' | sed 's/;.*//')
-rm -f /tmp/n8n-e2e-login-headers.txt
+COOKIE=$(grep -i set-cookie /tmp/n8n-e2e-headers.txt 2>/dev/null | head -1 | sed 's/[Ss]et-[Cc]ookie: //' | sed 's/;.*//')
+rm -f /tmp/n8n-e2e-headers.txt
 
 if [ -z "$COOKIE" ]; then
   echo -e "${RED}  Login failed — cannot generate API key${NC}"
@@ -82,9 +82,13 @@ if [ -z "$COOKIE" ]; then
 fi
 echo -e "${GREEN}  Login OK${NC}"
 
+# Save session cookie for E2E tests
+echo -n "$COOKIE" > "$SCRIPT_DIR/config/.n8n-session-cookie"
+echo -e "${GREEN}  Session cookie saved${NC}"
+
 # ------------------------------------------------------------------ API key
 
-echo -e "${YELLOW}[5/6] Generating API key...${NC}"
+echo -e "${YELLOW}[5/8] Generating API key...${NC}"
 
 # n8n 2.x /rest/api-keys requires: label, scopes (array), expiresAt (epoch ms)
 EXPIRES=$(python3 -c "import time; print(int((time.time() + 365*86400) * 1000))")
@@ -145,14 +149,35 @@ else
   exit 1
 fi
 
+# ------------------------------------------------------------------ Keycloak token
+
+echo -e "${YELLOW}[6/8] Obtaining Keycloak token...${NC}"
+
+KC_TOKEN_URL=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['keycloak']['tokenUrl'])")
+MC_CLIENT_ID=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['magnetCustomer']['clientId'])")
+MC_CLIENT_SECRET=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['magnetCustomer']['clientSecret'])")
+MC_SUB_DOMAIN=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['magnetCustomer']['subDomainAccount'])")
+KC_USERNAME=$(python3 -c "import json; c=json.load(open('$CONFIG_FILE')); print(c.get('keycloak',{}).get('username','e2e-admin'))")
+KC_PASSWORD=$(python3 -c "import json; c=json.load(open('$CONFIG_FILE')); print(c.get('keycloak',{}).get('password','<KC_PASSWORD>'))")
+
+KC_RESPONSE=$(curl -sf -X POST "$KC_TOKEN_URL" \
+  -d "client_id=$MC_CLIENT_ID&client_secret=$MC_CLIENT_SECRET&grant_type=password&username=$KC_USERNAME&password=$KC_PASSWORD" 2>/dev/null || echo "")
+
+MC_TOKEN=$(echo "$KC_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null || echo "")
+
+if [ -z "$MC_TOKEN" ]; then
+  echo -e "${RED}  Failed to obtain Keycloak token${NC}"
+  echo -e "${YELLOW}  Response: $KC_RESPONSE${NC}"
+  exit 1
+fi
+echo -e "${GREEN}  Keycloak token obtained (${#MC_TOKEN} chars)${NC}"
+
 # ------------------------------------------------------------------ credential
 
-echo -e "${YELLOW}[6/6] Provisioning MagnetCustomer credential...${NC}"
-MC_SUB_DOMAIN=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['magnetCustomer']['subDomainAccount'])")
-MC_CLIENT_SECRET=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE'))['magnetCustomer']['clientSecret'])")
+echo -e "${YELLOW}[7/8] Provisioning MagnetCustomer credential...${NC}"
 
 # Use internal REST (cookie-based) since public API may lack credential:create scope
-CRED_CODE=$(curl -sf -o /dev/null -w "%{http_code}" -X POST "$N8N_URL/rest/credentials" \
+CRED_RESPONSE=$(curl -sf -X POST "$N8N_URL/rest/credentials" \
   -H "Cookie: $COOKIE" \
   -H "Content-Type: application/json" \
   -d "{
@@ -161,21 +186,22 @@ CRED_CODE=$(curl -sf -o /dev/null -w "%{http_code}" -X POST "$N8N_URL/rest/crede
     \"data\": {
       \"subDomainAccount\": \"$MC_SUB_DOMAIN\",
       \"email\": \"\",
-      \"apiToken\": \"$MC_CLIENT_SECRET\"
+      \"apiToken\": \"$MC_TOKEN\"
     }
-  }" 2>/dev/null || echo "000")
+  }" 2>/dev/null || echo "")
 
-if [ "$CRED_CODE" = "200" ]; then
-  echo -e "${GREEN}  Credential created${NC}"
-elif [ "$CRED_CODE" = "409" ]; then
-  echo -e "${GREEN}  Credential already exists${NC}"
+CRED_ID=$(echo "$CRED_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('data',d).get('id',''))" 2>/dev/null || echo "")
+
+if [ -n "$CRED_ID" ]; then
+  echo -e "${GREEN}  Credential created (id: $CRED_ID)${NC}"
 else
-  echo -e "${YELLOW}  Credential creation returned HTTP $CRED_CODE (may already exist)${NC}"
+  echo -e "${YELLOW}  Credential may already exist (response: ${CRED_RESPONSE:0:100})${NC}"
 fi
 
-# ------------------------------------------------------------------ community package
+# ------------------------------------------------------------------ community package + dist copy
 
-echo -e "${YELLOW}[7/7] Installing MagnetCustomer node...${NC}"
+echo -e "${YELLOW}[8/8] Installing MagnetCustomer node...${NC}"
+
 INSTALL_CODE=$(curl -sf -o /dev/null -w "%{http_code}" -X POST "$N8N_URL/rest/community-packages" \
   -H "Cookie: $COOKIE" \
   -H "Content-Type: application/json" \
@@ -187,6 +213,28 @@ elif [ "$INSTALL_CODE" = "409" ]; then
   echo -e "${GREEN}  Node already installed${NC}"
 else
   echo -e "${YELLOW}  Node install returned HTTP $INSTALL_CODE (may already be installed)${NC}"
+fi
+
+# Copy local dist to container to ensure latest build is used
+if docker ps --format '{{.Names}}' | grep -q 'n8n-e2e'; then
+  echo -e "${YELLOW}  Copying local dist to container...${NC}"
+  docker cp "$ROOT_DIR/dist/." n8n-e2e:/home/node/.n8n/nodes/node_modules/@magnetcustomer/n8n-nodes-magnetcustomer/dist/ 2>/dev/null || true
+
+  echo -e "${YELLOW}  Restarting container...${NC}"
+  docker restart n8n-e2e > /dev/null 2>&1
+
+  # Wait for health after restart
+  for i in $(seq 1 $RETRIES); do
+    if curl -sf "$N8N_URL/healthz" > /dev/null 2>&1; then
+      echo -e "${GREEN}  n8n healthy after restart (${i}s)${NC}"
+      break
+    fi
+    if [ "$i" -eq "$RETRIES" ]; then
+      echo -e "${RED}  n8n failed to restart after ${RETRIES}s${NC}"
+      exit 1
+    fi
+    sleep 1
+  done
 fi
 
 # ------------------------------------------------------------------ done

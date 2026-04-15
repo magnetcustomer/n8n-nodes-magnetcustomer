@@ -1,12 +1,12 @@
 // e2e/helpers/workflowBuilder.ts
 import { getConfig } from './config';
-import { getRequiredCustomFields } from './testContext';
+import { getRequiredCustomFields, getE2EContext } from './testContext';
 
 const PREFIX = () => getConfig().options.cleanupPrefix;
 
 /** Merge required custom fields from globalSetup with any test-provided ones */
-function contactCustomFields(overrideFields: any[] = []): { customFields: any[] } {
-  const required = getRequiredCustomFields();
+function contactCustomFields(lifecycle: 'prospect' | 'customer' | 'lead', overrideFields: any[] = []): { customFields: any[] } {
+  const required = getRequiredCustomFields(lifecycle);
   return { customFields: [...required, ...overrideFields] };
 }
 
@@ -24,7 +24,7 @@ export function prospectCreate(overrides: Record<string, any> = {}) {
       gender: '', birthDate: '', work: '', maritalStatus: '',
       doc: '', type: 'pf', state: '', city: '', address: '',
       addressNumber: '', complement: '', neighborhood: '', cep: '',
-      owners: '', customFieldCollection: contactCustomFields(),
+      owners: '', customFieldCollection: contactCustomFields('prospect'),
       ...overrides,
     },
   };
@@ -41,7 +41,7 @@ export function customerCreate(overrides: Record<string, any> = {}) {
       gender: '', birthDate: '', work: '', maritalStatus: '',
       doc: '', type: 'pf', state: '', city: '', address: '',
       addressNumber: '', complement: '', neighborhood: '', cep: '',
-      owners: '', customFieldCollection: contactCustomFields(),
+      owners: '', customFieldCollection: contactCustomFields('customer'),
       ...overrides,
     },
   };
@@ -58,13 +58,14 @@ export function leadCreate(overrides: Record<string, any> = {}) {
       gender: '', birthDate: '', work: '', maritalStatus: '',
       doc: '', type: 'pf', state: '', city: '', address: '',
       addressNumber: '', complement: '', neighborhood: '', cep: '',
-      owners: '', customFieldCollection: contactCustomFields(),
+      owners: '', customFieldCollection: contactCustomFields('lead'),
       ...overrides,
     },
   };
 }
 
 export function dealCreate(pipelineId: string, overrides: Record<string, any> = {}) {
+  const ctx = getE2EContext();
   return {
     resource: 'deal',
     operation: 'create',
@@ -72,7 +73,7 @@ export function dealCreate(pipelineId: string, overrides: Record<string, any> = 
       title: `${PREFIX()}Deal ${Date.now()}`,
       description: 'E2E test deal',
       amount: 1000, expectedCloseDate: '2027-12-31',
-      pipeline: pipelineId, stage: '', staff: '',
+      pipeline: pipelineId, stage: ctx.stageId || '', staff: '',
       associateWith: '', contact: '', organization: '',
       customFieldCollection: { customFields: [] },
       ...overrides,
@@ -268,7 +269,7 @@ export function contactUpdate(resource: string, idParam: string, id: string, ove
       gender: '', birthDate: '', work: '', maritalStatus: '',
       doc: '', type: '', state: '', city: '', address: '',
       addressNumber: '', complement: '', neighborhood: '', cep: '',
-      owners: '', customFieldCollection: contactCustomFields(),
+      owners: '', customFieldCollection: { customFields: [] },
       ...overrides,
     },
   };
