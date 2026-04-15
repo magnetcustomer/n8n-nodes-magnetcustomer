@@ -549,8 +549,8 @@ export class MagnetCustomer implements INodeType {
 
 		for (let i = 0; i < length; i++) {
 			try {
-				const resource = this.getNodeParameter('resource', 0);
-				const operation = this.getNodeParameter('operation', 0);
+				const resource = this.getNodeParameter('resource', i);
+				const operation = this.getNodeParameter('operation', i);
 				let responseData;
 
 				switch (resource) {
@@ -615,7 +615,7 @@ export class MagnetCustomer implements INodeType {
 				// Resolve custom fields for supported resources on read operations
 				const shouldResolve = ['get', 'getAll'].includes(String(operation))
 					&& ['customer', 'deal', 'organization', 'prospect', 'lead'].includes(String(resource))
-					&& (this.getNodeParameter('resolveCustomFields', 0, false) as boolean === true);
+					&& (this.getNodeParameter('resolveCustomFields', i, false) as boolean === true);
 				if (shouldResolve && responseData) {
 					const featureMap: Record<string, string> = {
 						customer: 'contact',

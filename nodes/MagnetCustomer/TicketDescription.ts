@@ -25,7 +25,7 @@ export const ticketOperations: INodeProperties[] = [
 
 export const ticketFields: INodeProperties[] = [
 	{ displayName: 'Ticket ID', name: 'ticketId', type: 'string', displayOptions: { show: { operation: ['get', 'delete', 'update'], resource: ['ticket'] } }, default: '', required: true },
-	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['getAll'], resource: ['ticket'] } }, default: 0 },
+	{ displayName: 'Page', name: 'page', type: 'number', displayOptions: { show: { operation: ['getAll'], resource: ['ticket'] } }, default: 1 },
 	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 15 }, displayOptions: { show: { operation: ['getAll'], resource: ['ticket'] } }, default: 15, description: 'Max number of results to return' },
 
 	// create/update fields

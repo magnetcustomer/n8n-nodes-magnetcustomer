@@ -97,7 +97,7 @@ export async function magnetCustomerApiRequest(
 
 	try {
 		const credentialType = authenticationMethod === 'apiToken' ? 'magnetCustomerApi' : 'magnetCustomerOAuth2Api';
-		return this.helpers.requestWithAuthentication.call(this, credentialType, options,);
+		return await this.helpers.requestWithAuthentication.call(this, credentialType, options,);
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
@@ -224,7 +224,7 @@ export function magnetCustomerResolveCustomFields(
 				continue;
 			}
 
-			if (['varchar', 'text', 'phone', 'link', 'date', 'time', 'enum', 'monetary', 'double',].includes(customFieldData.fieldType.fieldType)) {
+			if (['varchar', 'text', 'phone', 'link', 'date', 'time', 'monetary', 'double',].includes(customFieldData.fieldType.fieldType)) {
 				json[customFieldData.name] = value;
 				delete json[key];
 			}
@@ -299,7 +299,9 @@ export function addCustomFields(collection: { customFields?: [{ _id: string, v: 
 			"v": customField.v,
 		});
 		} else {
-			console.warn('Skipping custom field entry due to missing ID or value:', customField);
+			if (process.env.N8N_DEBUG_MCJ === '1') {
+				console.warn('Skipping custom field entry due to missing ID or value:', customField);
+			}
 		}
 	}
 

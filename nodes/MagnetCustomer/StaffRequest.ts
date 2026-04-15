@@ -65,7 +65,9 @@ export async function staffRequest(
 			// Send request for create
 			const response = await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 			// Log the raw response for create
-			console.log('Raw API Response (Create Staff):', JSON.stringify(response, null, 2));
+			if (process.env.N8N_DEBUG_MCJ === '1') {
+				console.log('Raw API Response (Create Staff):', JSON.stringify(response, null, 2));
+			}
 			return response; // Return the full response for create
 
 		case 'update':

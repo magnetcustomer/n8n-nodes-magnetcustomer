@@ -93,6 +93,11 @@ const qs: IDataObject = {};
 			break;
 	}
 
+	if (operation === 'delete') {
+		await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+		return { success: true };
+	}
+
 	return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
 }
 
