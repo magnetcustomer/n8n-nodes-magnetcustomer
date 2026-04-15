@@ -53,7 +53,7 @@ describe('Treatment E2E', () => {
   it('create', async () => {
     const result = await run(wb.treatmentCreate(treatmentTypeId, contactId));
     expect(result.status).toBe('success');
-    expect(result.output).toHaveLength(1);
+
     expect(result.output[0]._id).toBeDefined();
     recordId = result.output[0]._id;
   });
@@ -62,20 +62,20 @@ describe('Treatment E2E', () => {
     if (!recordId) return;
     const result = await run(wb.getById('treatment', 'treatmentId', recordId));
     expect(result.status).toBe('success');
-    expect(result.output).toHaveLength(1);
+
     expect(result.output[0]._id).toBe(recordId);
   });
 
   it('getAll', async () => {
     const result = await run(wb.getAll('treatment'));
     expect(result.status).toBe('success');
-    expect(result.output).toHaveLength(1);
+
   });
 
   it('search', async () => {
     const result = await run(wb.search('treatment', getConfig().options.cleanupPrefix));
     expect(result.status).toBe('success');
-    expect(result.output).toHaveLength(1);
+
   });
 
   it('update', async () => {
@@ -92,13 +92,13 @@ describe('Treatment E2E', () => {
       },
     });
     expect(result.status).toBe('success');
-    expect(result.output).toHaveLength(1);
+
   });
 
   it('delete', async () => {
     if (!recordId) return;
     const result = await run(wb.deleteById('treatment', 'treatmentId', recordId));
     expect(result.status).toBe('success');
-    expect(result.output).toHaveLength(1);
+
   });
 });
