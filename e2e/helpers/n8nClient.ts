@@ -1,4 +1,12 @@
-// e2e/helpers/n8nClient.ts
+/**
+ * n8n REST API client for E2E tests.
+ *
+ * Uses internal REST API (cookie-based auth) for full access.
+ * The public API has too many scope restrictions in n8n 2.x.
+ *
+ * Execution strategy: Webhook node with httpMethod POST + responseMode "lastNode".
+ * POST to webhook URL → n8n executes workflow → returns output in HTTP response.
+ */
 import { getConfig } from './config';
 
 interface WorkflowConfig {
@@ -9,19 +17,52 @@ interface WorkflowConfig {
 }
 
 interface ExecutionResult {
-  status: 'success' | 'error' | 'waiting';
+  status: 'success' | 'error';
   output: Record<string, any>[];
   error?: string;
 }
 
+// ------------------------------------------------------------------ auth
+
+let sessionCookie: string | null = null;
+
+async function ensureSession(): Promise<string> {
+  if (sessionCookie) return sessionCookie;
+
+  const config = getConfig();
+  const res = await fetch(`${config.n8n.url}/rest/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      emailOrLdapLoginId: 'e2e@magnetcustomer.com',
+      password: '<E2E_PASSWORD>',
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`n8n login failed: ${res.status} ${await res.text()}`);
+  }
+
+  const cookies = (res.headers as any).getSetCookie?.() || [];
+  const cookie = (cookies[0] || res.headers.get('set-cookie') || '').split(';')[0];
+  if (!cookie) throw new Error('No session cookie from n8n login');
+
+  sessionCookie = cookie;
+  return cookie;
+}
+
+// ------------------------------------------------------------------ fetch
+
 async function n8nFetch(path: string, options: RequestInit = {}): Promise<any> {
   const config = getConfig();
+  const cookie = await ensureSession();
   const url = `${config.n8n.url}${path}`;
+
   const res = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      'X-N8N-API-KEY': config.n8n.apiKey,
+      'Cookie': cookie,
       ...options.headers,
     },
   });
@@ -32,32 +73,43 @@ async function n8nFetch(path: string, options: RequestInit = {}): Promise<any> {
   }
 
   const text = await res.text();
-  return text ? JSON.parse(text) : null;
+  if (!text) return null;
+
+  const parsed = JSON.parse(text);
+  // Internal REST wraps response in { data: ... }
+  return parsed.data !== undefined ? parsed.data : parsed;
 }
+
+// ------------------------------------------------------------------ workflow builders
 
 function buildWorkflowJson(wfConfig: WorkflowConfig): object {
   const { resource, operation, params, credentialId } = wfConfig;
-
-  const nodeParams: Record<string, any> = {
-    authentication: 'apiToken',
-    resource,
-    operation,
-    ...params,
-  };
+  const webhookPath = `e2e-${resource}-${operation}-${Date.now()}`;
 
   return {
     name: `e2e-${resource}-${operation}-${Date.now()}`,
     nodes: [
       {
-        parameters: {},
-        id: 'trigger-1',
-        name: 'Manual Trigger',
-        type: 'n8n-nodes-base.manualTrigger',
-        typeVersion: 1,
+        parameters: {
+          httpMethod: 'POST',
+          path: webhookPath,
+          responseMode: 'lastNode',
+          options: {},
+        },
+        id: 'webhook-1',
+        name: 'Webhook',
+        type: 'n8n-nodes-base.webhook',
+        typeVersion: 2,
         position: [0, 0],
+        webhookId: webhookPath,
       },
       {
-        parameters: nodeParams,
+        parameters: {
+          authentication: 'apiToken',
+          resource,
+          operation,
+          ...params,
+        },
         id: 'mc-1',
         name: 'MagnetCustomer',
         type: '@magnetcustomer/n8n-nodes-magnetcustomer.magnetCustomer',
@@ -72,7 +124,7 @@ function buildWorkflowJson(wfConfig: WorkflowConfig): object {
       },
     ],
     connections: {
-      'Manual Trigger': {
+      Webhook: {
         main: [[{ node: 'MagnetCustomer', type: 'main', index: 0 }]],
       },
     },
@@ -100,7 +152,7 @@ function buildTriggerWorkflowJson(
         type: '@magnetcustomer/n8n-nodes-magnetcustomer.magnetCustomerTrigger',
         typeVersion: 1,
         position: [0, 0],
-        webhookId: `e2e-${Date.now()}`,
+        webhookId: `e2e-trigger-${Date.now()}`,
         credentials: {
           magnetCustomerApi: {
             id: credentialId,
@@ -114,13 +166,19 @@ function buildTriggerWorkflowJson(
   };
 }
 
-export async function createWorkflow(config: WorkflowConfig): Promise<{ id: string }> {
+// ------------------------------------------------------------------ workflow CRUD
+
+export async function createWorkflow(config: WorkflowConfig): Promise<{ id: string; webhookPath: string }> {
   const body = buildWorkflowJson(config);
-  const result = await n8nFetch('/api/v1/workflows', {
+  const result = await n8nFetch('/rest/workflows', {
     method: 'POST',
     body: JSON.stringify(body),
   });
-  return { id: result.id };
+
+  const webhookNode = result.nodes?.find((n: any) => n.type === 'n8n-nodes-base.webhook');
+  const webhookPath = webhookNode?.parameters?.path || webhookNode?.webhookId || result.id;
+
+  return { id: result.id, webhookPath };
 }
 
 export async function createTriggerWorkflow(
@@ -129,62 +187,74 @@ export async function createTriggerWorkflow(
   credentialId: string,
 ): Promise<{ id: string; webhookPath: string }> {
   const body = buildTriggerWorkflowJson(resource, action, credentialId);
-  const result = await n8nFetch('/api/v1/workflows', {
+  const result = await n8nFetch('/rest/workflows', {
     method: 'POST',
     body: JSON.stringify(body),
   });
 
-  const webhookNode = result.nodes?.find((n: any) => n.type?.includes('Trigger'));
-  const webhookPath = webhookNode?.webhookId || result.id;
+  const triggerNode = result.nodes?.find((n: any) => n.type?.includes('Trigger'));
+  const webhookPath = triggerNode?.webhookId || result.id;
 
   return { id: result.id, webhookPath };
 }
 
-export async function executeAndWait(workflowId: string): Promise<ExecutionResult> {
-  const config = getConfig();
-  const timeout = config.options.timeoutMs;
+// ------------------------------------------------------------------ execution
 
-  const execResponse = await n8nFetch(`/api/v1/workflows/${workflowId}/run`, {
+export async function executeAndWait(workflowId: string, webhookPath: string): Promise<ExecutionResult> {
+  const config = getConfig();
+
+  // Activate the workflow (webhooks only work when active)
+  await activateWorkflow(workflowId);
+
+  // Small delay for n8n to register the webhook
+  await new Promise((r) => setTimeout(r, 500));
+
+  // POST to the webhook URL — triggers execution, returns output directly
+  const webhookUrl = `${config.n8n.url}/webhook/${webhookPath}`;
+  const res = await fetch(webhookUrl, {
     method: 'POST',
-    body: JSON.stringify({}),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trigger: true }),
   });
 
-  const executionId = execResponse.data?.executionId || execResponse.executionId;
-  if (!executionId) {
-    throw new Error(`No executionId returned for workflow ${workflowId}`);
+  // Deactivate after execution
+  try { await deactivateWorkflow(workflowId); } catch {}
+
+  if (!res.ok) {
+    const body = await res.text();
+    return { status: 'error', output: [], error: `Webhook ${res.status}: ${body}` };
   }
 
-  const start = Date.now();
-  while (Date.now() - start < timeout) {
-    const exec = await n8nFetch(`/api/v1/executions/${executionId}`);
+  const responseBody = await res.text();
+  if (!responseBody) return { status: 'success', output: [] };
 
-    if (exec.finished || exec.status === 'success' || exec.status === 'error') {
-      const lastNode = exec.data?.resultData?.runData?.['MagnetCustomer'];
-      const output = lastNode?.[0]?.data?.main?.[0]?.map((item: any) => item.json) || [];
+  const data = JSON.parse(responseBody);
+  const output = Array.isArray(data) ? data : [data];
 
-      return {
-        status: exec.status === 'error' ? 'error' : 'success',
-        output,
-        error: exec.data?.resultData?.error?.message,
-      };
-    }
-
-    await new Promise((r) => setTimeout(r, 500));
-  }
-
-  throw new Error(`Execution ${executionId} timed out after ${timeout}ms`);
+  return { status: 'success', output };
 }
 
+// ------------------------------------------------------------------ lifecycle
+
 export async function activateWorkflow(workflowId: string): Promise<void> {
-  await n8nFetch(`/api/v1/workflows/${workflowId}/activate`, { method: 'POST' });
+  // n8n 2.x internal REST requires versionId for activate
+  const wf = await n8nFetch(`/rest/workflows/${workflowId}`);
+  await n8nFetch(`/rest/workflows/${workflowId}/activate`, {
+    method: 'POST',
+    body: JSON.stringify({ versionId: wf.versionId }),
+  });
 }
 
 export async function deactivateWorkflow(workflowId: string): Promise<void> {
-  await n8nFetch(`/api/v1/workflows/${workflowId}/deactivate`, { method: 'POST' });
+  const wf = await n8nFetch(`/rest/workflows/${workflowId}`);
+  await n8nFetch(`/rest/workflows/${workflowId}/deactivate`, {
+    method: 'POST',
+    body: JSON.stringify({ versionId: wf.versionId }),
+  });
 }
 
 export async function deleteWorkflow(workflowId: string): Promise<void> {
-  await n8nFetch(`/api/v1/workflows/${workflowId}`, { method: 'DELETE' });
+  await n8nFetch(`/rest/workflows/${workflowId}`, { method: 'DELETE' });
 }
 
 export async function getWebhookUrl(webhookPath: string): Promise<string> {
@@ -192,7 +262,8 @@ export async function getWebhookUrl(webhookPath: string): Promise<string> {
   return `${config.n8n.url}/webhook/${webhookPath}`;
 }
 
-/** Track workflow IDs for cleanup */
+// ------------------------------------------------------------------ tracking
+
 const createdWorkflowIds: string[] = [];
 
 export function trackWorkflow(id: string): void {
@@ -207,18 +278,11 @@ export async function deleteAllTrackedWorkflows(): Promise<number> {
   let deleted = 0;
   for (const id of createdWorkflowIds) {
     try {
+      try { await deactivateWorkflow(id); } catch {}
       await deleteWorkflow(id);
       deleted++;
-    } catch { /* workflow may already be deleted */ }
+    } catch {}
   }
   createdWorkflowIds.length = 0;
   return deleted;
-}
-
-/** Get credential ID by name */
-export async function getCredentialId(name: string): Promise<string> {
-  const result = await n8nFetch('/api/v1/credentials');
-  const cred = result.data?.find((c: any) => c.name === name);
-  if (!cred) throw new Error(`Credential "${name}" not found in n8n`);
-  return cred.id;
 }

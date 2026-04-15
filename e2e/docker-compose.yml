@@ -11,9 +11,10 @@ services:
       - N8N_RUNNERS_ENABLED=false
       - N8N_ENCRYPTION_KEY=n8n-e2e-test-encryption-key
       - DB_TYPE=sqlite
+      - N8N_CUSTOM_EXTENSIONS=/custom-nodes
     volumes:
-      - ../dist:/home/node/.n8n/custom/node_modules/@magnetcustomer/n8n-nodes-magnetcustomer/dist:ro
-      - ../package.json:/home/node/.n8n/custom/node_modules/@magnetcustomer/n8n-nodes-magnetcustomer/package.json:ro
+      - ../dist:/custom-nodes/@magnetcustomer/n8n-nodes-magnetcustomer/dist:ro
+      - ../package.json:/custom-nodes/@magnetcustomer/n8n-nodes-magnetcustomer/package.json:ro
       - n8n_data:/home/node/.n8n
 
 volumes:

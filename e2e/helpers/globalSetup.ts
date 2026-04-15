@@ -99,7 +99,9 @@ export default async function globalSetup() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailOrLdapLoginId: 'e2e@magnetcustomer.com', password: '<E2E_PASSWORD>' }),
       });
-      const cookie = loginRes.headers.get('set-cookie')?.split(';')[0] || '';
+      // Node.js fetch: use getSetCookie() or raw header
+      const cookies = (loginRes.headers as any).getSetCookie?.() || [];
+      const cookie = (cookies[0] || loginRes.headers.get('set-cookie') || '').split(';')[0];
       if (cookie) {
         const intRes = await fetch(`${config.n8n.url}/rest/credentials`, {
           headers: { 'Cookie': cookie },
