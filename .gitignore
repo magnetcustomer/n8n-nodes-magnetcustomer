@@ -10,3 +10,4 @@ yarn.lock
 coverage
 e2e/config/e2e.config.json
 e2e/config/.e2e-context.json
+e2e/config/.n8n-session-cookie

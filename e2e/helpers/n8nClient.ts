@@ -24,7 +24,22 @@ interface ExecutionResult {
 
 // ------------------------------------------------------------------ auth
 
-let sessionCookie: string | null = null;
+import * as fs from 'fs';
+import * as path from 'path';
+
+const COOKIE_FILE = path.resolve(__dirname, '../config/.n8n-session-cookie');
+
+/** Persist cookie to disk so it survives across Jest worker processes */
+function loadCachedCookie(): string | null {
+  try {
+    if (fs.existsSync(COOKIE_FILE)) {
+      return fs.readFileSync(COOKIE_FILE, 'utf-8').trim() || null;
+    }
+  } catch {}
+  return null;
+}
+
+let sessionCookie: string | null = loadCachedCookie();
 
 async function ensureSession(): Promise<string> {
   if (sessionCookie) return sessionCookie;
@@ -48,6 +63,8 @@ async function ensureSession(): Promise<string> {
   if (!cookie) throw new Error('No session cookie from n8n login');
 
   sessionCookie = cookie;
+  // Persist so other Jest worker processes can reuse
+  try { fs.writeFileSync(COOKIE_FILE, cookie); } catch {}
   return cookie;
 }
 

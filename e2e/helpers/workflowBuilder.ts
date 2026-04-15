@@ -1,7 +1,17 @@
 // e2e/helpers/workflowBuilder.ts
 import { getConfig } from './config';
+import { getRequiredCustomFields } from './testContext';
 
 const PREFIX = () => getConfig().options.cleanupPrefix;
+
+/** Merge required custom fields from globalSetup with any test-provided ones */
+function contactCustomFields(overrideFields: any[] = []): { customFields: any[] } {
+  const required = getRequiredCustomFields();
+  return { customFields: [...required, ...overrideFields] };
+}
+
+/** Default phone for contact-like resources (phones is often required) */
+const DEFAULT_PHONE = { phones: [{ number: '+5511999990000' }] };
 
 export function prospectCreate(overrides: Record<string, any> = {}) {
   return {
@@ -10,11 +20,11 @@ export function prospectCreate(overrides: Record<string, any> = {}) {
     params: {
       fullname: `${PREFIX()}Prospect ${Date.now()}`,
       email: `${PREFIX()}prospect-${Date.now()}@test.com`,
-      phoneCollection: { phones: [{ number: '+5511999990000' }] },
-      gender: 'male', birthDate: '', work: '', maritalStatus: '',
+      phoneCollection: DEFAULT_PHONE,
+      gender: '', birthDate: '', work: '', maritalStatus: '',
       doc: '', type: 'pf', state: '', city: '', address: '',
       addressNumber: '', complement: '', neighborhood: '', cep: '',
-      owners: '', customFieldCollection: { customFields: [] },
+      owners: '', customFieldCollection: contactCustomFields(),
       ...overrides,
     },
   };
@@ -27,11 +37,11 @@ export function customerCreate(overrides: Record<string, any> = {}) {
     params: {
       fullname: `${PREFIX()}Customer ${Date.now()}`,
       email: `${PREFIX()}customer-${Date.now()}@test.com`,
-      phoneCollection: { phones: [] }, gender: '', birthDate: '',
-      work: '', maritalStatus: '', doc: '', type: 'pf',
-      state: '', city: '', address: '', addressNumber: '',
-      complement: '', neighborhood: '', cep: '',
-      owners: '', customFieldCollection: { customFields: [] },
+      phoneCollection: DEFAULT_PHONE,
+      gender: '', birthDate: '', work: '', maritalStatus: '',
+      doc: '', type: 'pf', state: '', city: '', address: '',
+      addressNumber: '', complement: '', neighborhood: '', cep: '',
+      owners: '', customFieldCollection: contactCustomFields(),
       ...overrides,
     },
   };
@@ -44,11 +54,11 @@ export function leadCreate(overrides: Record<string, any> = {}) {
     params: {
       fullname: `${PREFIX()}Lead ${Date.now()}`,
       email: `${PREFIX()}lead-${Date.now()}@test.com`,
-      phoneCollection: { phones: [] }, gender: '', birthDate: '',
-      work: '', maritalStatus: '', doc: '', type: 'pf',
-      state: '', city: '', address: '', addressNumber: '',
-      complement: '', neighborhood: '', cep: '',
-      owners: '', customFieldCollection: { customFields: [] },
+      phoneCollection: DEFAULT_PHONE,
+      gender: '', birthDate: '', work: '', maritalStatus: '',
+      doc: '', type: 'pf', state: '', city: '', address: '',
+      addressNumber: '', complement: '', neighborhood: '', cep: '',
+      owners: '', customFieldCollection: contactCustomFields(),
       ...overrides,
     },
   };
@@ -77,7 +87,7 @@ export function organizationCreate(overrides: Record<string, any> = {}) {
     params: {
       fullname: `${PREFIX()}Org ${Date.now()}`,
       email: `${PREFIX()}org-${Date.now()}@test.com`,
-      phoneCollection: { phones: [] }, birthDate: '',
+      phoneCollection: DEFAULT_PHONE, birthDate: '',
       doc: '', state: '', city: '', address: '',
       addressNumber: '', complement: '', neighborhood: '', cep: '',
       owners: '', customFieldCollection: { customFields: [] },
@@ -230,7 +240,8 @@ export function treatmentTypeCreate(overrides: Record<string, any> = {}) {
 }
 
 export function getById(resource: string, idParam: string, id: string) {
-  return { resource, operation: 'get', params: { [idParam]: id } };
+  // id must be non-empty for n8n 2.x workflow activation validation
+  return { resource, operation: 'get', params: { [idParam]: id || 'placeholder' } };
 }
 
 export function getAll(resource: string, page = 1, limit = 25) {
@@ -242,5 +253,23 @@ export function search(resource: string, query: string, page = 1, limit = 25) {
 }
 
 export function deleteById(resource: string, idParam: string, id: string) {
-  return { resource, operation: 'delete', params: { [idParam]: id } };
+  return { resource, operation: 'delete', params: { [idParam]: id || 'placeholder' } };
+}
+
+/** Update for contact-like resources with all required params */
+export function contactUpdate(resource: string, idParam: string, id: string, overrides: Record<string, any> = {}) {
+  return {
+    resource,
+    operation: 'update',
+    params: {
+      [idParam]: id || 'placeholder',
+      fullname: `${PREFIX()}Updated ${Date.now()}`,
+      email: '', phoneCollection: DEFAULT_PHONE,
+      gender: '', birthDate: '', work: '', maritalStatus: '',
+      doc: '', type: '', state: '', city: '', address: '',
+      addressNumber: '', complement: '', neighborhood: '', cep: '',
+      owners: '', customFieldCollection: contactCustomFields(),
+      ...overrides,
+    },
+  };
 }

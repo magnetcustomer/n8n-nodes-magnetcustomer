@@ -11,6 +11,7 @@ interface E2EContext {
   treatmentTypeId?: string;
   customFieldTypeId?: string;
   credentialId?: string;
+  requiredCustomFields?: string; // JSON-stringified array
 }
 
 let ctx: E2EContext | null = null;
@@ -32,4 +33,20 @@ export function getCredentialId(): string {
   const c = getE2EContext();
   if (!c.credentialId) throw new Error('No credential ID in E2E context');
   return c.credentialId;
+}
+
+/**
+ * Get required custom fields discovered by globalSetup.
+ * Returns array of { _id, v } matching the n8n customFieldCollection format.
+ * The node's addCustomFields() converts _id → customField before sending to API.
+ */
+export function getRequiredCustomFields(): Array<{ _id: string; v: string }> {
+  const c = getE2EContext();
+  if (!c.requiredCustomFields) return [];
+  try {
+    const fields = JSON.parse(c.requiredCustomFields);
+    return fields.map((f: any) => ({ _id: f.customField, v: f.v }));
+  } catch {
+    return [];
+  }
 }

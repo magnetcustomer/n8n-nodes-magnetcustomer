@@ -54,31 +54,7 @@ describe('Lead E2E', () => {
   });
 
   it('update', async () => {
-    const result = await run({
-      resource: 'lead',
-      operation: 'update',
-      params: {
-        leadId: recordId,
-        fullname: `${getConfig().options.cleanupPrefix}Updated`,
-        email: '',
-        phoneCollection: {},
-        gender: '',
-        birthDate: '',
-        work: '',
-        maritalStatus: '',
-        doc: '',
-        type: '',
-        state: '',
-        city: '',
-        address: '',
-        addressNumber: '',
-        complement: '',
-        neighborhood: '',
-        cep: '',
-        owners: '',
-        customFieldCollection: {},
-      },
-    });
+    const result = await run(wb.contactUpdate('lead', 'leadId', recordId));
     expect(result.status).toBe('success');
     expect(result.output).toHaveLength(1);
   });

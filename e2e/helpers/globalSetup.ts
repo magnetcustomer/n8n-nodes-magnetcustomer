@@ -44,11 +44,14 @@ export default async function globalSetup() {
   }
   console.log('  MC API: healthy');
 
-  // 5. Login to n8n
+  // 5. Login to n8n and persist cookie for test workers
   const cookie = await n8nLogin(config.n8n.url);
   if (!cookie) {
     throw new Error('Failed to login to n8n');
   }
+  // Save cookie so n8nClient in test workers doesn't need to login again (avoids rate limiting)
+  const cookieFile = path.resolve(__dirname, '../config/.n8n-session-cookie');
+  fs.writeFileSync(cookieFile, cookie);
 
   // 6. Find or create n8n credential with fresh token
   const context: Record<string, string> = {};
@@ -136,7 +139,38 @@ export default async function globalSetup() {
     }
   } catch { console.warn('  CustomFieldType: not available'); }
 
-  // 8. Save context
+  // 8. Discover required custom fields for contact-like resources
+  try {
+    const allFields = await mcFetch('/customfields?feature=contact&creatable=true');
+    const fields = Array.isArray(allFields) ? allFields : allFields?.docs || allFields?.data || [];
+
+    const requiredCustomFields: Array<{ customField: string; v: string; name: string }> = [];
+
+    for (const f of fields) {
+      const s = f.settings || {};
+      const isRequired = s.required && Array.isArray(s.requiredWhen) &&
+        (s.requiredWhen.includes('prospect') || s.requiredWhen.includes('customer') || s.requiredWhen.includes('lead'));
+
+      if (isRequired && !f.system && f.values?.length > 0) {
+        // Enum/set custom field — use first value
+        requiredCustomFields.push({
+          customField: f._id,
+          v: f.values[0]._id,
+          name: f.name,
+        });
+        console.log(`  Required CF: ${f.name} → ${f.values[0].value}`);
+      }
+    }
+
+    if (requiredCustomFields.length > 0) {
+      (context as any).requiredCustomFields = JSON.stringify(requiredCustomFields);
+      console.log(`  Total required custom fields: ${requiredCustomFields.length}`);
+    }
+  } catch (e: any) {
+    console.warn(`  Required custom fields: ${e.message || 'not available'}`);
+  }
+
+  // 9. Save context
   fs.writeFileSync(CONTEXT_FILE, JSON.stringify(context, null, 2));
   console.log('[E2E Global Setup] Done.\n');
 }

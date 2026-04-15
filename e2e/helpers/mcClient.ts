@@ -1,5 +1,13 @@
 // e2e/helpers/mcClient.ts
-import { getConfig } from './config';
+import { getConfig, getApiToken } from './config';
+
+let cachedToken: string | null = null;
+
+async function getToken(): Promise<string> {
+  if (cachedToken) return cachedToken;
+  cachedToken = await getApiToken();
+  return cachedToken;
+}
 
 async function mcFetch(
   method: string,
@@ -8,6 +16,7 @@ async function mcFetch(
   qs?: Record<string, any>,
 ): Promise<any> {
   const config = getConfig();
+  const token = await getToken();
   const url = new URL(`${config.magnetCustomer.apiUrl}/api${endpoint}`);
 
   if (qs) {
@@ -16,14 +25,12 @@ async function mcFetch(
     }
   }
 
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${config.magnetCustomer.clientSecret}`,
-  };
-
   const res = await fetch(url.toString(), {
     method,
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
     body: body ? JSON.stringify(body) : undefined,
   });
 
