@@ -134,7 +134,7 @@ export async function customFieldRequest(
 			if (subFieldSettingsUpdate !== '{}') { // Só envia se não for objeto vazio
 				try {
 					body.subFieldSettings = JSON.parse(subFieldSettingsUpdate);
-				} catch (e) { console.error("Invalid JSON for subFieldSettings", e); }
+				} catch (e) { if (process.env.N8N_DEBUG_MCJ === '1') { console.error("Invalid JSON for subFieldSettings", e); } }
 			}
 			const settingsUpdate = this.getNodeParameter('settings', index, {}) as object;
 			if (Object.keys(settingsUpdate).length > 0) { // Só envia se não for objeto vazio

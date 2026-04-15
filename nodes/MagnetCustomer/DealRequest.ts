@@ -134,9 +134,14 @@ export async function dealRequest(
 			break;
 	}
 
+	if (operation === 'delete') {
+		await magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs);
+		return { success: true };
+	}
+
 	if (['GET'].includes(String(requestMethod))) return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 
-	// For POST, PUT, DELETE, return the full response
+	// For POST, PUT, return the full response
 	return magnetCustomerApiRequest.call(this, requestMethod, endpoint, body, qs,);
 }
 

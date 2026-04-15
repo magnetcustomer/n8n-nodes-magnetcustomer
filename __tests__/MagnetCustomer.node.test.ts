@@ -591,7 +591,7 @@ describe('Delete response patterns', () => {
 		expect(output[0].success).toBe(true);
 	});
 
-	it('Deal delete returns API response directly', async () => {
+	it('Deal delete returns { success: true }', async () => {
 		const apiResponse = { _id: 'd1', deleted: true };
 		const ctx = createExecuteContext(
 			{ authentication: 'apiToken', resource: 'deal', operation: 'delete', dealId: 'd1' },
@@ -601,9 +601,8 @@ describe('Delete response patterns', () => {
 		const result = await node.execute.call(ctx as any);
 		const output = getOutputItems(result);
 
-		// Deal delete does NOT wrap in { success: true }, it returns the raw API response
-		expect(output[0]._id).toBe('d1');
-		expect(output[0].deleted).toBe(true);
+		// Deal delete now wraps in { success: true } for consistency
+		expect(output[0].success).toBe(true);
 	});
 });
 

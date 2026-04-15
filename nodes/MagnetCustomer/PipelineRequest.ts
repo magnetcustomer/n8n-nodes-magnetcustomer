@@ -107,14 +107,15 @@ export async function pipelineRequest(this: IExecuteFunctions, operation: string
 		endpoint = `/pipelines/${pipelineId}`;
 		method = 'DELETE';
 
-		// Send request for delete and return the full response
-		return magnetCustomerApiRequest.call(this, method, endpoint, body, qs);
+		// Send request for delete and return success
+		await magnetCustomerApiRequest.call(this, method, endpoint, body, qs);
+		return { success: true };
 	} else if (operation === 'search') {
 		method = 'GET';
 		endpoint = '/pipelines';
-		// qs já contém limit, filtros e sort da lógica de getAll
-		// A única diferença é que o campo 'search' dentro de filters será usado
-		// (A lógica de getAll já pega o search de dentro de filters)
+		qs.search = this.getNodeParameter('search', i) as string;
+		const searchLimit = this.getNodeParameter('limit', i, 15) as number;
+		if (searchLimit) qs.limit = searchLimit;
 	}
 
 	// Make the single API request (only for GET operations now)
